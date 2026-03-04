@@ -1,0 +1,47 @@
+// Lab: SameSite Strict bypass via client-side redirect
+
+This lab's change email function is vulnerable to CSRF. To solve the lab, perform a CSRF attack that changes the victim's email address. You should use the provided exploit server to host your attack.
+
+You can log in to your own account using the following credentials: wiener:peter
+
+
+
+
+
+// Solution 
+
+
+1. Login as given credentials and then while chane email on /my-account/change-email and then intercept
+   the request in BURP
+
+   Study the POST /my-account/change-email request and notice that this doesn't contain any unpredictable tokens, so may be vulnerable to CSRF if you can bypass any SameSite cookie restrictions.
+
+2. Look at the response to your POST /login request. Notice that the website explicitly specifies SameSite=Strict when setting session cookies. This prevents the browser from including these cookies in cross-site requests.
+
+
+3. In the browser, go to one of the blog posts and post an any comment. Observe that you're initially sent to a confirmation page at /post/comment/confirmation?postId=x but, after a few seconds, you're taken back to the blog post.
+
+   Study the JavaScript and notice that this uses the postId query parameter to dynamically construct the path for the client-side redirect.
+
+
+4. Now In the browser, go to the exploit server and Inject the Script
+
+<script>
+    document.location = "https://YOUR-LAB-ID.web-security-academy.net/post/comment/confirmation?postId=2../my-account";
+</script>
+
+it will not work
+
+
+5. Now Send the POST /my-account/change-email request to Burp Repeater.
+   In Burp Repeater, right-click on the request and select Change request method. Burp automatically generates an equivalent GET request.
+
+
+6 Now Inject the final script in the exploit server
+
+
+// Exploit
+
+<script>
+    document.location = "https://0a7100f70341cc86809c030800b2000b.web-security-academy.net/post/comment/confirmation?postId=2/../../my-account/change-email?email=bobby%40microsoft.com%26submit=1";
+</script>

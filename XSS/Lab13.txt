@@ -1,0 +1,22 @@
+// Lab: Stored XSS into onclick event with angle brackets and double quotes HTML-encoded and single quotes and backslash escaped
+
+
+This lab contains a stored cross-site scripting vulnerability in the comment functionality.
+
+To solve this lab, submit a comment that calls the alert function when the comment author name is clicked.
+
+
+
+// Solution
+
+/* When the XSS context is some existing JavaScript within a quoted tag attribute, such as an event handler, it is possible to make use of HTML-encoding to work around some input filters.
+When the browser has parsed out the HTML tags and attributes within a response, it will perform HTML-decoding of tag attribute values before they are processed any further. If the server-side application blocks or sanitizes certain characters that are needed for a successful XSS exploit, you can often bypass the input validation by HTML-encoding those characters. */
+
+and the application blocks or escapes single quote characters, you can use the following payload to break out of the JavaScript string and execute your own script:
+
+
+Inject this script: 
+
+&apos;-alert(document.domain)-&apos; -> In comment 
+
+https://foo?&apos;-alert(document.domain)-&apos; -> In website

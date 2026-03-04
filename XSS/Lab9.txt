@@ -1,0 +1,16 @@
+// Lab: Reflected XSS with some SVG markup allowed
+
+This lab has a simple reflected XSS vulnerability. The site is blocking common tags but misses some SVG tags and events.
+
+To solve the lab, perform a cross-site scripting attack that calls the alert() function.
+
+
+
+// Solution
+
+// First We Inject On search Query we first check using <SVG> markup
+
+then we Inject:
+"><svg><animatetransatetransform onbegin=alert(1)>
+
+using animateTransform with onbegin=alert(1) to trigger XSS 

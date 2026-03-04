@@ -1,0 +1,14 @@
+// SQL injection with filter bypass via XML encoding
+
+
+1. First I went to cyberchef and select HTML entity
+
+and apply payload 
+UNION SELECT username FROM users
+I got username
+
+2. Then I use the payload 
+UNION SELECT password FROM users
+I got password
+
+3. I login as an administrator 

