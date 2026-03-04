@@ -1,0 +1,32 @@
+// Lab: Clobbering DOM attributes to bypass HTML filters
+
+This lab uses the HTMLJanitor library, which is vulnerable to DOM clobbering. To solve this lab, construct a vector that bypasses the filter and uses DOM clobbering to inject a vector that calls the print() function. You may need to use the exploit server in order to make your vector auto-execute in the victim's browser.
+
+
+
+
+// Solution:
+
+// Another common technique is to use a form element along with an element such as input to clobber DOM properties. 
+For example, clobbering the attributes property enables you to bypass client-side filters that use it in their logic. Although the filter will enumerate the attributes property, it will not actually remove any attributes because the property has been clobbered with a DOM node. As a result, you will be able to inject malicious attributes that would normally be filtered out.
+
+For example:
+
+<form onclick=alert(1)><input id=attributes>Click me
+
+
+1. Now Inject this any of them in the blog comment section:
+
+<form id=x tabindex=0 onfocus=print()><input id=attributes>
+
+    or 
+
+<form onclick=alert(1)><input id=attributes>Click me
+
+
+// The library uses the attributes property to filter HTML attributes. However, it is still possible to clobber the attributes property itself, causing the length to be undefined. This allows us to inject any attributes we want into the form element. In this case, we use the onfocus attribute to smuggle the print() function.
+
+
+2. Go to the exploit server and add the following iframe to the body:
+
+<iframe src="https://0a870064043d84db80a4ea6d000f0014.web-security-academy.net/post?postId=3" onload="setTimeout(() => this.src=this.src+'#x', 500)" ></iframe>
