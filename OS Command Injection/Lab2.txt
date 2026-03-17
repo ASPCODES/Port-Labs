@@ -1,0 +1,43 @@
+// Lab: Blind OS command injection with time delays
+
+
+This lab contains a blind OS command injection vulnerability in the feedback function.
+
+The application executes a shell command containing the user-supplied details. The output from the command is not returned in the response.
+
+To solve the lab, exploit the blind OS command injection vulnerability to cause a 10 second delay.
+
+
+
+
+// Solution
+
+
+// Blind OS command injection vulnerabilities
+
+Many instances of OS command injection are blind vulnerabilities. This means that the application does not return the output from the command within its HTTP response. Blind vulnerabilities can still be exploited, but different techniques are required.
+
+As an example, imagine a website that lets users submit feedback about the site. The user enters their email address and feedback message. The server-side application then generates an email to a site administrator containing the feedback.
+
+To do this, it calls out to the mail program with the submitted details:
+
+mail -s "This site is great" -aFrom:peter@normal-user.net feedback@vulnerable-website.com
+
+
+// The ping command is a good way to do this, because lets you specify the number of ICMP packets to send.
+
+
+//           Steps to solve
+
+1. Go to the submit feedback and fill the form and Intercept the submit form
+
+2. Send that to repeater and check the details below there you see the email 
+
+3. Modify the email to the given command:
+
+email=x||ping+-c+10+127.0.0.1||
+
+4. send the Modify request and you will notice the server is taking 10 sec delay before showing the
+   HTTP 200/Ok message 
+
+5. Send back the request to the server and lab will be solved.  

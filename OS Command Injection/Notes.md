@@ -33,3 +33,20 @@ The Attack: The user enters 8.8.8.8; cat /etc/passwd.
 
 The Result: The server runs the ping, then immediately executes cat /etc/passwd, exposing sensitive system user data to the attacker.
 
+
+
+## Useful commands:
+
+
+Purpose of command	             Linux	              Windows
+
+
+Name of current user             whoami	              whoami
+
+Operating system                 uname -a             ver
+
+Network configuration            ifconfig             ipconfig /all
+
+Network connections              netstat -an          netstat -an
+
+Running processes                ps -ef               tasklist
