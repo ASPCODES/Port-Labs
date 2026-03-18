@@ -50,3 +50,17 @@ Network configuration            ifconfig             ipconfig /all
 Network connections              netstat -an          netstat -an
 
 Running processes                ps -ef               tasklist
+
+
+
+## Ways of injecting OS commands:
+
+The following command separators work on both Windows and Unix-based systems:
+
+&
+
+&&
+
+|
+
+||
