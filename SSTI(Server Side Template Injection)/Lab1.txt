@@ -1,0 +1,44 @@
+// Lab: Basic server-side template injection:
+
+
+This lab is vulnerable to server-side template injection due to the unsafe construction of an ERB template.
+
+To solve the lab, review the ERB documentation to find out how to execute arbitrary code, then delete the morale.txt file from Carlos's home directory.
+
+
+
+
+// Solution
+
+
+             // Steps to solve the Lab
+
+1. Notice that when you try to view more details about the first product, a GET request uses the message parameter to render "Unfortunately this product is out of stock" on the home page.
+
+
+2. In the ERB documentation, discover that the syntax <%= someExpression %> is used to evaluate an expression and render the result on the page.
+
+
+3. Use ERB template syntax to create a test payload containing a mathematical operation, for example:
+
+<%= 7*7 %>
+
+
+4. URL-encode this payload and insert it as the value of the message parameter in the URL as follows:
+
+https://YOUR-LAB-ID.web-security-academy.net/?message=<%= 7*7 %>
+
+
+5. After Injecting and reload the page we can see the SSTI vulnerablility as the server evaluate the input and we got the response shown in the web page as:
+
+49 
+
+
+6. So now let's Inject the following payload to delete the morale.txt file in Carlos directory:
+
+<%= system("rm /home/carlos/morale.txt") %>
+
+https://YOUR-LAB-ID.web-security-academy.net/?message=<%= system("rm /home/carlos/morale.txt") %>
+
+
+7. Hence the lab will be solved.
