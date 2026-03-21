@@ -1,0 +1,17 @@
+// Lab: Server-side template injection with a custom exploit.
+
+
+This lab is vulnerable to server-side template injection. To solve the lab, create a custom exploit to delete the file /.ssh/id_rsa from Carlos's home directory.
+
+You can log in to your own account using the following credentials: wiener:peter
+
+
+
+
+// Solution
+
+
+// For detailed solution refer to this particular video for this Lab:
+
+https://www.youtube.com/watch?v=atTJS1Ra218
+
