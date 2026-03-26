@@ -1,0 +1,39 @@
+// Lab: File path traversal, traversal sequences stripped non-recursively.
+
+
+
+This lab contains a path traversal vulnerability in the display of product images.
+
+The application strips path traversal sequences from the user-supplied filename before using it.
+
+To solve the lab, retrieve the contents of the /etc/passwd file.
+
+
+
+Hint: You might be able to use nested traversal sequences, such as ....// or ....\/. These revert to simple traversal sequences when the inner sequence is stripped.
+
+
+// Solution:
+
+
+1. Go to the product details there we can see the product with product Id.
+
+
+2. The vulnerable endpoint is /image, which takes a filename parameter.
+
+
+3. Copy the image Link and open in new Tab.
+
+
+4. modify the filename with:
+
+filename=....//....//....//etc/passwd
+
+
+5. The URL looks like this:
+
+https://0a2500f5041f1b1e8427f4fb007000be.web-security-academy.net/image?filename=....//....//....//etc/passwd
+
+
+
+6. This will solve the Lab.

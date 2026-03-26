@@ -1,0 +1,50 @@
+// Lab: File path traversal, traversal sequences stripped with superfluous URL-decode
+
+
+This lab contains a path traversal vulnerability in the display of product images.
+
+The application blocks input containing path traversal sequences. It then performs a URL-decode of the input before using it.
+
+To solve the lab, retrieve the contents of the /etc/passwd file.
+
+
+
+
+
+// Solution:
+
+1. The vulnerable endpoint is /product/image, which takes a filename as a parameter. The application blocks input containing path traversal sequences, such as "../". However, it performs a URL-decode of the input before using it.
+
+
+
+2. To bypass the filter, we can use a double URL-encoded traversal sequence, such as ..%252f, which will be decoded to ../ by the application.
+
+
+
+3. Go to the product details there we can see the product with product Id.
+
+
+
+4. The vulnerable endpoint is /image, which takes a filename parameter.
+
+
+
+5. Copy the image Link and open in new Tab.
+
+
+
+6. Modify the filename with:
+
+filename=..%252f..%252f..%252fetc/passwd
+
+../../../../etc/passwd
+
+
+
+7. The URL looks like this:
+
+https://0a11001d036c95ae8207973100de003d.web-security-academy.net/image?filename=..%252f..%252f..%252fetc/passwd
+
+
+
+8. This will solve the Lab.

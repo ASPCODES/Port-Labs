@@ -1,0 +1,40 @@
+// Lab: File path traversal, validation of file extension with null byte bypass.
+
+
+This lab contains a path traversal vulnerability in the display of product images.
+
+The application validates that the supplied filename ends with the expected file extension.
+
+To solve the lab, retrieve the contents of the /etc/passwd file.
+
+
+
+
+// Hint:
+
+An application may require the user-supplied filename to end with an expected file extension, such as .png. In this case, it might be possible to use a null byte to effectively terminate the file path before the required extension. For example: 
+filename=../../../etc/passwd%00.png.
+
+
+// Solution:
+
+1. Go to the product details there we can see the product with product Id.
+
+
+2. Copy the image Link and open in new Tab.
+
+
+3. modify the filename with:
+
+filename=../../../etc/passwd%00.png
+
+
+4. The URL looks like this:
+
+https://0ab900040315234b88490732009d00fa.web-security-academy.net/image?filename=../../../etc/passwd%00.png
+
+
+5. The contents of the /etc/passwd file are displayed, confirming the path traversal vulnerability and successful exploitation using a null byte bypass.
+
+
+6. The lab is solved.
