@@ -1,0 +1,117 @@
+// Lab: Method-based access control can be circumvented
+
+
+This lab implements access controls based partly on the HTTP method of requests. You can familiarize yourself with the admin panel by logging in using the credentials administrator:admin.
+
+To solve the lab, log in using the credentials wiener:peter and exploit the flawed access controls to promote yourself to become an administrator.
+
+
+
+
+// Solution
+
+PHASE 1: Work as admin
+
+1. Log in as admin
+
+Open the lab and go to My Account.
+
+Use credentials: administrator / admin.
+
+
+2. Open admin panel
+
+Visit /admin.
+
+Find Carlos, click Upgrade.
+
+Before clicking, enable Burp Suite intercept.
+
+
+
+3. Capture promotion request
+
+In interceptor you should see:
+
+
+POST /admin-roles HTTP/1.1
+Host: your-lab-id.web-security-academy.net
+Cookie: session=AbCdEfGhIjKlMnOp  (admin session)
+
+username=carlos&action=upgrade
+
+
+Right-click → “Send to Repeater”.
+
+Turn intercept off or forward.
+
+
+
+PHASE 2: Get Wiener session
+
+
+4. Open incognito/private window
+
+Same lab URL.
+
+Log in as wiener / peter.
+
+
+
+5. Copy Wiener session cookie
+
+Open DevTools (F12) → Application → Cookies → session.
+
+Or capture from Burp request Cookie: session=....
+
+Example token: session=XyZ123WienerSessionToken
+
+
+
+
+PHASE 3: Exploit in Repeater
+
+
+6. Go to Burp Repeater (admin request captured)
+
+Original request uses admin session:
+Cookie: session=AbCdEfGhIjKlMnOp
+
+body: username=carlos&action=upgrade
+
+
+7. Replace with Wiener session
+
+Set Cookie: session=XyZ123WienerSessionToken.
+
+Send.
+
+Expected response: Unauthorized (normal).
+
+
+
+
+
+PHASE 4: Bypass method check
+
+
+8. Try POSTX method
+
+Change request line to:
+POSTX /admin-roles HTTP/1.1
+
+Keep Wiener cookie and same body.
+
+Send → response: Missing parameter (indicates method check path only).
+
+
+9. Convert to GET
+
+
+Change request to:
+GET /admin-roles?username=carlos&action=upgrade HTTP/1.1
+
+If needed, change username:
+GET /admin-roles?username=wiener&action=upgrade HTTP/1.1
+
+Send → expected 302 or 200: success, lab solved.

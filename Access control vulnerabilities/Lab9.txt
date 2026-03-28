@@ -1,0 +1,37 @@
+IDOR
+
+// Lab: Insecure direct object references.
+
+
+This lab stores user chat logs directly on the server's file system, and retrieves them using static URLs.
+
+Solve the lab by finding the password for the user carlos, and logging into their account.
+
+
+
+A brief about it:
+
+Insecure direct object references
+Insecure direct object references (IDORs) are a subcategory of access control vulnerabilities. IDORs occur if an application uses user-supplied input to access objects directly and an attacker can modify the input to obtain unauthorized access. It was popularized by its appearance in the OWASP 2007 Top Ten. It's just one example of many implementation mistakes that can provide a means to bypass access controls.
+
+
+
+// Solution:
+
+
+1. Visit the lab and review the page and you will see the live-chat option.
+
+
+2. Click on the live-chat option and you will see a chat box and you can send the message and view the transcript then a file will be downloaded with 5.txt
+
+
+3. Now copy the file URL and paste it in the new tab and you will see the chat transcript and the URL will be like this: /downloads/trans-script/5.txt
+
+
+4. Now change the 5.txt to 1.txt and will see the chat transcript of carlos and in that transcript, you will find the password for carlos which is: lw04pzxq0kborfmpejya
+
+
+5. Now go back to the login page and log in with the credentials: carlos:lw04pzxq0kborfmpejya
+
+
+6. After logging in, you will be able to access carlos's account and solve the lab.

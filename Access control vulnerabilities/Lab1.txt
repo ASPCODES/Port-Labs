@@ -1,0 +1,25 @@
+// Lab: Unprotected admin functionality
+
+
+This lab has an unprotected admin panel.
+
+Solve the lab by deleting the user carlos.
+
+
+
+// Solution:
+
+
+1. Get the robots.txt file at https://0a5a003c04f25f2683db56e100ad0091.web-security-academy.net/robots.txt. 
+
+
+2. There you can see disallowed: /administrator-panel
+
+
+3. Go to https://0a5a003c04f25f2683db56e100ad0091.web-security-academy.net/administrator-panel
+
+
+4. There you can see a list of users, including carlos. Click the delete button next to carlos to delete the user.
+
+
+5. The lab should now be solved.

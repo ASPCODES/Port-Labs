@@ -1,0 +1,47 @@
+// Lab: User ID controlled by request parameter with password disclosure
+
+
+This lab has user account page that contains the current user's existing password, prefilled in a masked input.
+
+To solve the lab, retrieve the administrator's password, then use it to delete the user carlos.
+
+You can log in to your own account using the following credentials: wiener:peter.
+
+
+
+Remember that: 
+
+ A horizontal privilege escalation attack can be turned into a vertical privilege escalation, by compromising a more privileged user. For example, a horizontal escalation might allow an attacker to reset or capture the password belonging to another user. If the attacker targets an administrative user and compromises their account, then they can gain administrative access and so perform vertical privilege escalation.
+
+An attacker might be able to gain access to another user's account page using the parameter tampering technique already described for horizontal privilege escalation:
+
+https://insecure-website.com/myaccount?id=456
+
+If the target user is an application administrator, then the attacker will gain access to an administrative account page. This page might disclose the administrator's password or provide a means of changing it, or might provide direct access to privileged functionality.
+
+
+
+
+
+// Solution:
+
+
+Step 1 — Log in by using the provided credentials (e.g., wiener:peter).
+
+
+Step 2 — Visit the account page and Intercept the request with Burp Suite. You should see a URL like /my-account?id=wiener.
+
+
+Step 3 — Send to Burp Repeater and send the request to check the response.
+
+
+Step 4 — Modify the id parameter to id=administrator and send the request again.
+
+
+Step 5 — Review the response. The response will be a 200 OK, and the body contains the administrator's password in a masked input field. Copy the password.
+
+
+Step 6 — Log out and log in again using the administrator's credentials (e.g., administrator:5g5k0qi4l4rjs9evgsze).
+
+
+step 7 — Now after logging in as an administrator, Go to the admin panel and delete the user carlos to solve the lab.

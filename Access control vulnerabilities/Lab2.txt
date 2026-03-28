@@ -1,0 +1,41 @@
+// Lab: Unprotected admin functionality with unpredictable URL.
+
+
+This lab has an unprotected admin panel. It's located at an unpredictable location, but the location is disclosed somewhere in the application.
+
+Solve the lab by accessing the admin panel, and using it to delete the user carlos.
+
+
+
+
+
+// Solution:
+
+
+1. Go to the home page of lab and review the source code in the view page source. You will find the following code snippet:
+
+
+var isAdmin = false;
+if (isAdmin) {
+   var topLinksTag = document.getElementsByClassName("top-links")[0];
+   var adminPanelTag = document.createElement('a');
+   adminPanelTag.setAttribute('href', '/admin-mlzoqd');
+   adminPanelTag.innerText = 'Admin panel';
+   topLinksTag.append(adminPanelTag);
+   var pTag = document.createElement('p');
+   pTag.innerText = '|';
+   topLinksTag.appendChild(pTag);
+}
+
+
+
+2. From the above code snippet, we can see that the admin panel is located at /admin-mlzoqd. So, we can access the admin panel by going to the following URL:
+
+https://0a34002a0438702c803adf9500f80084.web-security-academy.net/admin-mlzoqd
+
+
+
+3. Once you are on the admin panel, you will see a list of users. Find the user carlos and click on the delete button next to his name to delete the user.
+
+
+4. You have successfully solved the lab!

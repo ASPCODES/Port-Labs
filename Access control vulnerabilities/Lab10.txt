@@ -1,0 +1,35 @@
+// Lab: URL-based access control can be circumvented
+
+
+This website has an unauthenticated admin panel at /admin, but a front-end system has been configured to block external access to that path. However, the back-end application is built on a framework that supports the X-Original-URL header.
+
+To solve the lab, access the admin panel and delete the user carlos.
+
+
+
+
+A brief:
+
+Sometimes, a website will implement rigorous access controls over some of these steps, but ignore others. Imagine a website where access controls are correctly applied to the first and second steps, but not to the third step. The website assumes that a user will only reach step 3 if they have already completed the first steps, which are properly controlled. An attacker can gain unauthorized access to the function by skipping the first two steps and directly submitting the request for the third step with the required parameters.
+
+
+
+// Solution:
+
+
+step 1: If you access the /admin page directly, you will see that it is blocked by the front-end system. However, the back-end application supports the X-Original-URL header, which can be used to bypass the access control.
+
+
+step 2: visit the website and intercept the request to / using a proxy tool like Burp Suite.
+
+
+step 3: modify the request to include the X-Original-URL header with the value /invalid, and forward the request to the server.Then you can see the server acknowledges the X-Original-URL header by returning the error message "Not Found" instead of blocking the request.
+
+
+step 4: Now modify the request to include the X-Original-URL header with the value /admin, and forward the request to the server. Then you can access the admin panel and see the two users, carlos and wiener. 
+
+
+step 5: Modify the Get / with /?username=carlos and X-Original-URL: /admin/delete, and forward the request to the server. Then you can see the message "User carlos deleted successfully" in the response, which indicates that you have successfully deleted the user carlos from the admin panel.
+
+
+step 6: The lab will be solved.

@@ -1,0 +1,62 @@
+// Lab: User role controlled by request parameter.
+
+
+
+This lab has an admin panel at /admin, which identifies administrators using a forgeable cookie.
+
+Solve the lab by accessing the admin panel and using it to delete the user carlos.
+
+You can log in to your own account using the following credentials: wiener:peter
+
+
+
+Hints:
+
+Parameter-based access control methods
+Some applications determine the user's access rights or role at login, and then store this information in a user-controllable location. This could be:
+
+A hidden field.
+A cookie.
+A preset query string parameter.
+
+The application makes access control decisions based on the submitted value. For example:
+
+https://insecure-website.com/login/home.jsp?admin=true
+https://insecure-website.com/login/home.jsp?role=1
+
+
+This approach is insecure because a user can modify the value and access functionality they're not authorized to, such as administrative functions.
+
+
+
+
+// Solution
+
+
+1. Go to the product home page and log in with the credentials wiener:peter.
+
+
+2. If you access /admin page you will get the http:403 Forbidden response because you are not an administrator.
+
+
+3. Login and intercept the request to the /login using a proxy tool like Burp Suite.
+
+
+4. Send the request to the repeater and close the intercept.
+
+
+5. In the repeater, change the value of the admin parameter from false to true and send the request.
+
+
+6. You will get the http:200 OK response and the Set-Cookie header will have the value of admin=true.
+
+
+7. Now reload the page and go to inspect and then strorage and then cookies. You will see the admin cookie with the value of false. Change the value to true and reload the page.
+
+
+8. Now you will have access to the admin panel, Click on the admin panel and then click on the delete button next to the user carlos to delete the user.
+
+
+9. The lab will be solved after you delete the user carlos.
+
+

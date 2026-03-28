@@ -1,0 +1,49 @@
+// Lab: User role can be modified in user profile
+
+
+This lab has an admin panel at /admin. It's only accessible to logged-in users with a roleid of 2.
+
+Solve the lab by accessing the admin panel and using it to delete the user carlos.
+
+You can log in to your own account using the following credentials: wiener:peter.
+
+
+
+
+Hints: 
+
+Parameter-based access control methods
+Some applications determine the user's access rights or role at login, and then store this information in a user-controllable location. This could be:
+
+A hidden field.
+A cookie.
+A preset query string parameter.
+
+The application makes access control decisions based on the submitted value. For example:
+
+https://insecure-website.com/login/home.jsp?admin=true
+https://insecure-website.com/login/home.jsp?role=1
+
+
+This approach is insecure because a user can modify the value and access functionality they're not authorized to, such as administrative functions.
+
+
+
+
+
+// Solution:
+
+
+1. Go to the login page and log in with the credentials wiener:peter.
+
+
+2. After logging in, navigate to the admin panel at /admin. It says you can't access admin panel.
+
+
+3. Intercept the request while entering login credentials in Burp Suite and send it to the Repeater tab. Now close the intercept and in repeater send the request. You will see the roleid is 1 in the request.
+
+
+4. Now go to the change-email /account/change-email and intercept the request. Send it to the repeater, close the intercept and Now got to the repeater to change the roleid from 1 to 2 in the request and send it. you will see the role is changed to 2 in the response.
+
+
+5. Now refresh the page and you will see the admin panel is accessible. Now go to the admin panel and delete the user carlos to solve the lab.
