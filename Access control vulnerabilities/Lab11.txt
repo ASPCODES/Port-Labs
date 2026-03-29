@@ -95,10 +95,10 @@ Expected response: Unauthorized (normal).
 PHASE 4: Bypass method check
 
 
-8. Try POSTX method
+8. Try GET method
 
 Change request line to:
-POSTX /admin-roles HTTP/1.1
+GET /admin-roles HTTP/1.1
 
 Keep Wiener cookie and same body.
 

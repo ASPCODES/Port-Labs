@@ -1,0 +1,39 @@
+// Lab: Referer-based access control 
+
+
+This lab controls access to certain admin functionality based on the Referer header. You can familiarize yourself with the admin panel by logging in using the credentials administrator:admin.
+
+To solve the lab, log in using the credentials wiener:peter and exploit the flawed access controls to promote yourself to become an administrator.
+
+
+
+
+Hints: 
+
+Referer-based access control
+Some websites base access controls on the Referer header submitted in the HTTP request. The Referer header can be added to requests by browsers to indicate which page initiated a request.
+
+For example, an application robustly enforces access control over the main administrative page at /admin, but for sub-pages such as /admin/deleteUser only inspects the Referer header. If the Referer header contains the main /admin URL, then the request is allowed.
+
+In this case, the Referer header can be fully controlled by an attacker. This means that they can forge direct requests to sensitive sub-pages by supplying the required Referer header, and gain unauthorized access.
+
+
+
+Solution:
+
+1. Log in using the admin credentials.
+
+
+2. Browse to the admin panel, promote carlos, and send the HTTP request to Burp Repeater.
+
+
+3. Open a private/incognito browser window, and log in with the non-admin credentials.
+
+
+4. Browse to /admin-roles?username=carlos&action=upgrade and observe that the request is treated as unauthorized due to the absent Referer header.
+
+
+5. Copy the non-admin user's session cookie into the existing Burp Repeater request, change the username to yours, and replay it.
+
+
+6. The lab will be solved.
