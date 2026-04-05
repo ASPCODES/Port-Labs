@@ -1,0 +1,27 @@
+// Lab: Username enumeration via different responses
+
+
+This lab is vulnerable to username enumeration and password brute-force attacks. It has an account with a predictable username and password, which can be found in the following wordlists:
+
+Candidate usernames
+Candidate passwords
+
+To solve the lab, enumerate a valid username, brute-force this user's password, then access their account page.
+
+
+
+
+// Solution:
+
+1. Go to the login page and try to log in with a random username and password. Observe the error message and intercept the request using a tool like Burp Suite.
+
+
+2. Analyze the response and for invalid username, you will see a specific error message indicating that the username does not exist.
+
+3. Send it to intruder and use the candidate usernames wordlist to enumerate valid usernames. Look for a response that indicates a valid username.
+
+
+4. Once you have identified a valid username, use the candidate passwords wordlist to brute-force the password for that username.
+
+
+5. After successfully logging in with the valid username and password, you will be redirected to the account page, confirming that you have solved the lab.

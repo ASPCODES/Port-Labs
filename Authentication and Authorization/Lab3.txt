@@ -1,0 +1,67 @@
+// Lab: Password reset broken logic
+
+
+This lab's password reset functionality is vulnerable. To solve the lab, reset Carlos's password then log in and access his "My account" page.
+
+Your credentials: wiener:peter
+
+Victim's username: carlos 
+
+
+
+// Solution:
+
+Step 1 — Trigger a Reset for Your Own Account
+
+Go to the "Forgot password" page.
+
+Enter your username: wiener.
+
+Check your email (the lab provides an email client) and copy the reset link/token
+
+
+
+Step 2 — Intercept the Password Reset Request
+
+Click the reset link from your email.
+
+Open Burp Suite and turn on Intercept.
+
+Fill in a new password and submit the form.
+
+Burp will catch the POST request — it will look something like:
+
+
+POST /forgot-password?temp-forgot-password-token=abc123
+
+username=wiener&temp-forgot-password-token=abc123&new-password-1=test&new-password-2=test
+
+
+
+Step 3 — Identify the Broken Logic
+
+Notice that the username field is included in the POST body. The server is likely trusting this parameter to identify whose password to change, without verifying the token actually belongs to that user.
+
+
+
+Step 4 — Manipulate the Request
+
+In Burp, modify the username in the POST body:
+
+username=carlos&temp-forgot-password-token=abc123&new-password-1=hacked123&new-password-2=hacked123
+
+Keep the same token (your valid token), just change the username to carlos
+
+Forward the request.
+
+
+
+Step 5 — Log in as Carlos
+
+Go to the login page.
+
+Username: carlos.
+
+Password: hacked123 (whatever you set).
+
+Navigate to "My account" — lab solved! 
