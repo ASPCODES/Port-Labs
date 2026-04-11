@@ -1,0 +1,19 @@
+// Lab: Username enumeration via account lock
+
+
+This lab is vulnerable to username enumeration. It uses account locking, but this contains a logic flaw. To solve the lab, enumerate a valid username, brute-force this user's password, then access their account page.
+
+Candidate usernames
+Candidate passwords
+
+
+
+// Solution:
+
+Refer to this video for a Walkthrough:
+
+https://www.youtube.com/watch?v=3gTYBguuRQw&t=176s
+
+
+As this lab will be solved outside of Burp suite, While we Re-engineer the lab, we will use a custom script to generate the payloads for us. This is because we need to generate a large number of requests, and doing this manually would be time-consuming and leads to broken the lab sequence if we do it manually.
+
