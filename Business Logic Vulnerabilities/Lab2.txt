@@ -1,0 +1,17 @@
+// Lab: High-level logic vulnerability
+
+This lab doesn't adequately validate user input. You can exploit a logic flaw in its purchasing workflow to buy items for an unintended price. To solve the lab, buy a "Lightweight l33t leather jacket".
+
+You can log in to your own account using the following credentials: wiener:peter
+
+
+
+
+Hint: Here we have to choose 2 products and in that The leather one has to be quantity 1 and the other product has to be -1 so accordingly we can change or tamper the price.
+
+
+// Solution:
+
+Take the reference from this video:
+
+https://www.youtube.com/watch?v=E03sGJ0pKLw

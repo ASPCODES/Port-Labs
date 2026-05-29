@@ -1,0 +1,35 @@
+// Lab: Inconsistent security controls
+
+This lab's flawed logic allows arbitrary users to access administrative functionality that should only be available to company employees. To solve the lab, access the admin panel and delete the user carlos.
+
+
+
+
+
+// Solution:
+
+
+1. Open the Lab and Register a new user account with username email and password.
+
+
+2. In username use anything, in email use anything@exploit-0aa900d003f2a6d881d43d7b011e00a5.exploit-server.net found in the email Client and then use any password.
+
+
+3. Then while Register you get the registration link in the email client, click on it to verify your account.
+
+
+4. After verifying your account, you will be logged in with your account.
+
+
+5. There you see the update email option, now put the company employee email address which is
+anything@dontwannacry and click on update email.
+
+
+6. Now you have the company employee email address, now click on the admin panel and delete the user carlos and you will get the success message and the lab will be solved.
+
+
+
+Reference Link:
+
+https://www.youtube.com/watch?v=OZic8eCtiy4
+
