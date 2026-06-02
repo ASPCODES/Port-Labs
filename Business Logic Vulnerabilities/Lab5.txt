@@ -17,3 +17,10 @@ Attack flow:
 Add the jacket with qty=99 repeatedly until total overflows to negative
 Add cheap items (e.g. "Wrapping paper") to bring total to a small positive value ≤ your store credit ($100)
 Checkout //
+
+
+
+
+The script used in this is 
+
+// LogicFlowScript.go

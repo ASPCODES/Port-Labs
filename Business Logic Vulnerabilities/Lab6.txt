@@ -1,0 +1,26 @@
+// Lab: Inconsistent handling of exceptional input
+
+
+This lab doesn't adequately validate user input. You can exploit a logic flaw in its account registration process to gain access to administrative functionality. To solve the lab, access the admin panel and delete the user carlos.
+
+
+
+// Solution:
+
+
+// The Vulnerability
+The flaw is that the registration process doesn't properly handle exceptional input. By registering with a specially crafted username, you can bypass normal user
+
+
+The 255 characters used is:
+
+Here's the string where the m in @dontwannacry.com is exactly character 255:
+
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa@dontwannacry.com.exploit-0aa90007035265f380e61138011400ba.exploit-server.net
+
+
+
+take the reference from this video:
+
+https://youtu.be/jXqzFJfamJ4?si=-2rY-qTGlyDftH1L
+

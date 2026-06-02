@@ -1,0 +1,24 @@
+// Lab: Authentication bypass via flawed state machine.
+
+
+This lab makes flawed assumptions about the sequence of events in the login process. To solve the lab, exploit this flaw to bypass the lab's authentication, access the admin interface, and delete the user carlos.
+
+You can log in to your own account using the following credentials: wiener:peter.
+
+
+
+
+
+// Solution:
+
+1. Login with your credentials — Burp intercept ON
+
+2. POST /login → click Forward
+
+3. GET /role-selector → click Drop
+Browser shows error — that's fine, ignore it
+
+4. Manually type the lab's home URL in address bar and hit enter
+You'll have administrator role automatically.
+
+5. Go to /admin → delete carlos → lab solved

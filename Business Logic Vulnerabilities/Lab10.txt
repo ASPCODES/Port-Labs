@@ -1,0 +1,327 @@
+// Lab: Authentication bypass via encryption oracle
+
+
+This lab contains a logic flaw that exposes an encryption oracle to users. To solve the lab, exploit this flaw to gain access to the admin panel and delete the user carlos.
+
+You can log in to your own account using the following credentials: wiener:peter.
+
+
+
+
+
+// Solution:
+
+
+# Exploiting Encrypted Cookies using Burp Suite
+
+Step 1 - Login with "Stay logged in"
+
+* Open the lab website.
+* Login normally.
+* Enable the **"Stay logged in"** checkbox.
+* After login, Burp Suite will capture a cookie named something like:
+
+```http
+stay-logged-in=xxxxxxxx
+```
+
+This cookie is encrypted.
+
+---
+
+
+
+Step 2 - Trigger an Error Message
+
+* Go to any blog post.
+* Try posting a comment using an invalid email.
+
+Example:
+
+```text
+test
+```
+
+* Submit the comment.
+
+The response will redirect and set another encrypted cookie called:
+
+```http
+notification=xxxxxxxx
+```
+
+You will also see an error message like:
+
+```text
+Invalid email address: test
+```
+
+This means:
+
+* Our email input is encrypted inside the `notification` cookie.
+* The server later decrypts it and shows the result in the error message.
+
+So now we have:
+
+* One request to ENCRYPT data
+* Another request to DECRYPT data
+
+---
+
+
+
+Step 3 - Send Requests to Repeater
+
+Send these two requests to Burp Repeater:
+
+1. `POST /post/comment` → used for encryption
+2. `GET /post?postId=x` → used for decryption
+
+Rename the tabs:
+
+```text
+encrypt
+decrypt
+```
+
+---
+
+
+
+Step 4 - Decrypt the Stay-Logged-In Cookie
+
+In the `decrypt` request:
+
+* Copy the value of the `stay-logged-in` cookie.
+* Paste it into the `notification` cookie.
+
+Example:
+
+```http
+notification=<stay-logged-in-cookie>
+```
+
+Send the request.
+
+You should now see something like:
+
+```text
+wiener:1598530205184
+```
+
+This reveals the cookie format:
+
+```text
+username:timestamp
+```
+
+Copy the timestamp value.
+
+---
+
+
+
+Step 5 - Create an Administrator Cookie
+
+Go to the `encrypt` request.
+
+Change the email parameter to:
+
+```text
+administrator:your-timestamp
+```
+
+Example:
+
+```text
+administrator:1598530205184
+```
+
+Send the request.
+
+Copy the new encrypted `notification` cookie from the response.
+
+---
+
+
+
+Step 6 - Understand the Prefix Problem
+
+Now decrypt this new cookie using the `decrypt` request.
+
+You will see:
+
+```text
+Invalid email address: administrator:1598530205184
+```
+
+Problem:
+
+The application automatically adds:
+
+```text
+Invalid email address:
+```
+
+before our data.
+
+We need to remove this prefix.
+
+---
+
+
+Step 7 - Decode the Cookie
+
+Send the encrypted cookie to **Burp Decoder**.
+
+Do:
+
+1. URL Decode
+2. Base64 Decode
+
+Now you will see raw bytes.
+
+---
+
+
+
+Step 8 - Remove the Prefix Bytes
+
+The prefix:
+
+```text
+Invalid email address:
+```
+
+is 23 bytes long.
+
+But block ciphers work in blocks of 16 bytes.
+
+So removing only 23 bytes breaks the encryption alignment.
+
+We must make the prefix length a multiple of 16.
+
+---
+
+
+
+Step 9 - Add Padding
+
+Go back to the `encrypt` request.
+
+Add 9 extra characters before `administrator`.
+
+Example:
+
+```text
+xxxxxxxxxadministrator:1598530205184
+```
+
+Why 9?
+
+Because:
+
+```text
+23 + 9 = 32
+```
+
+And 32 is a multiple of 16.
+
+Send the request again.
+
+Copy the new encrypted cookie.
+
+---
+
+
+
+Step 10 - Remove the First 32 Bytes
+
+Again:
+
+* Send cookie to Decoder
+* URL Decode
+* Base64 Decode
+
+Now delete the first 32 bytes.
+
+This removes:
+
+```text
+Invalid email address: xxxxxxxxx
+```
+
+Now re-encode:
+
+1. Base64 Encode
+2. URL Encode
+
+Copy the final value.
+
+---
+
+
+
+Step 11 - Become Administrator
+
+From Burp history:
+
+* Send `GET /` request to Repeater.
+* Delete the normal session cookie.
+* Replace the `stay-logged-in` cookie with your crafted cookie.
+
+Example:
+
+```http
+stay-logged-in=<your-final-cookie>
+```
+
+Send the request.
+
+You should now be logged in as:
+
+```text
+administrator
+```
+
+---
+
+
+
+Step 12 - Delete Carlos
+
+Visit:
+
+```http
+/admin
+```
+
+You will see the admin panel.
+
+Now open:
+
+```http
+/ admin/delete?username=carlos
+```
+
+Lab solved.
+
+
+
+
+// Takeaways:
+
+1. We need to take an idea of encryption oracle and decryption oracle, then gives us the certain value that the web app is using that maybe we are not supposed to see the corresponding plain text value.
+
+
+2. The difference between block and stream cipher is that block cipher encrypts data in fixed-size blocks, while stream cipher encrypts data one bit or byte at a time. In this lab, we are dealing with a block cipher, which means that the encryption process operates on fixed-size blocks of data. and also padding is used to ensure that the plaintext data fits into the block size required by the cipher. This is important because if the plaintext data is not a multiple of the block size, it will need to be padded before encryption, and this can lead to vulnerabilities if not handled correctly.
+
+
+3. The relevance of base-64 encoding and decoding 
+
+
+
+Take a reference from this video:
+
+https://www.youtube.com/watch?v=tMS4bmNQ8Hc&list=PLWvfB8dRFqbYDNDvmDlGgM-UTRGpCyKQ1&index=12
+
