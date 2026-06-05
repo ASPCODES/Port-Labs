@@ -1,0 +1,45 @@
+// Lab: Web cache poisoning with an unkeyed header
+
+This lab is vulnerable to web cache poisoning because it handles input from an unkeyed header in an unsafe way. An unsuspecting user regularly visits the site's home page. To solve this lab, poison the cache with a response that executes alert(document.cookie) in the visitor's browser.
+
+
+
+
+// Solution:
+
+1. With Burp running, load the website's home page and intercept the request.
+
+2. In Burp, go to "Proxy" > "HTTP history" and study the requests and responses that you generated. Find the GET request for the home page and send it to Burp Repeater.
+Add a cache-buster query parameter, such as ?cb=1234.
+
+it looks like this: GET /?cb=1234 HTTP/1.1
+
+
+3. Add the X-Forwarded-Host header with an arbitrary hostname, such as exploitserver.com, and send the request. it's like Add the following header, remembering to enter your own exploit server ID:
+
+X-Forwarded-Host: YOUR-EXPLOIT-SERVER-ID.exploit-server.net
+
+
+4. Observe that the X-Forwarded-Host header has been used to dynamically generate an absolute URL for importing a JavaScript file stored at /resources/js/tracking.js. and copy this and paste it exploit server first file and also write alert(document.cookie) in the body and store it.
+
+
+5. Replay the request and observe that the response contains the header X-Cache: hit. This tells us that the response came from the cache.
+
+
+6. Open the GET request for the home page in Burp Repeater and remove the cache buster.
+
+
+7. Send your malicious request. Keep replaying the request until you see your exploit server URL being reflected in the response and X-Cache: hit in the headers. This means that the cache has been poisoned with your malicious response.
+
+
+8. To simulate the victim, load the poisoned URL in the browser and make sure that the alert() is triggered. Note that you have to perform this test before the cache expires. The cache on this lab expires every 30 seconds.
+
+
+9. Now remove the ?cb=1234 cache buster from the URL and load the home page again. You should see the alert() being triggered again, confirming that the cache is poisoned. and you have successfully completed the lab!
+
+
+
+// take the reference from the following video: 
+
+https://www.youtube.com/watch?v=r2NWdLvb_lE&list=PLGb2cDlBWRUUvoGqcCF1xe86AaRXGSMT5
+
