@@ -1,0 +1,259 @@
+// Lab: Forced OAuth profile linking
+
+
+This lab gives you the option to attach a social media profile to your account so that you can log in via OAuth instead of using the normal username and password. Due to the insecure implementation of the OAuth flow by the client application, an attacker can manipulate this functionality to obtain access to other users' accounts.
+
+To solve the lab, use a CSRF attack to attach your own social media profile to the admin user's account on the blog website, then access the admin panel and delete carlos.
+
+The admin user will open anything you send from the exploit server and they always have an active session on the blog website.
+
+You can log in to your own accounts using the following credentials:
+
+Blog website account: wiener:peter
+Social media profile: peter.wiener:hotdog
+
+
+
+
+
+// Solution:
+
+
+## Step 1
+
+Open the lab.
+
+---
+
+## Step 2
+
+Click **My Account**.
+
+---
+
+## Step 3
+
+Login using the **normal login form** (do NOT use social login).
+
+```
+Username: wiener
+Password: peter
+```
+
+---
+
+## Step 4
+
+After login, click **Attach a social profile**.
+
+---
+
+## Step 5
+
+You will be redirected to the social media website.
+
+Login there with:
+
+```
+Username: wiener
+Password: peter
+```
+
+---
+
+## Step 6
+
+After successful login, you will return to the blog.
+
+Your social account is now linked to your account.
+
+---
+
+## Step 7
+
+Click **Log out**.
+
+---
+
+## Step 8
+
+Click **My Account** again.
+
+Now click **Log in with social media**.
+
+You should be logged in instantly.
+
+(This confirms that your social account is linked.)
+
+---
+
+## Step 9
+
+Go to **Burp → Proxy → HTTP History**.
+
+Find the request:
+
+```
+GET /auth?client_id=...
+```
+
+Open it and notice:
+
+```
+redirect_uri=/oauth-linking
+```
+
+There is **no `state` parameter**.
+
+This is the vulnerability.
+
+---
+
+## Step 10
+
+Turn **Intercept ON** in Burp.
+
+---
+
+## Step 11
+
+Go back to the website.
+
+Click **Attach a social profile** again.
+
+---
+
+## Step 12
+
+Burp will intercept several requests.
+
+Keep clicking **Forward** until you see:
+
+```
+GET /oauth-linking?code=XXXXXXXX
+```
+
+---
+
+## Step 13
+
+Right-click this request.
+
+Select:
+
+```
+Copy URL
+```
+
+The copied URL will look like:
+
+```
+https://YOUR-LAB-ID.web-security-academy.net/oauth-linking?code=XXXXXXXX
+```
+
+---
+
+## Step 14
+
+Now click **Drop**.
+
+**Do NOT Forward this request.**
+
+Dropping it keeps the OAuth code valid.
+
+---
+
+## Step 15
+
+Turn **Intercept OFF**.
+
+---
+
+## Step 16
+
+Log out from the blog.
+
+---
+
+## Step 17
+
+Open the **Exploit Server**.
+
+---
+
+## Step 18
+
+In the Body section, write:
+
+```html
+<iframe src="PASTE_COPIED_URL_HERE"></iframe>
+```
+
+Example:
+
+```html
+<iframe src="https://YOUR-LAB-ID.web-security-academy.net/oauth-linking?code=abc123xyz"></iframe>
+```
+
+---
+
+## Step 19
+
+Click **Store**.
+
+---
+
+## Step 20
+
+Click **Deliver exploit to victim**.
+
+The victim's browser automatically loads the iframe.
+
+The victim unknowingly links **your social media account** to **their account (Admin)**.
+
+---
+
+## Step 21
+
+Go back to the blog.
+
+Click:
+
+```
+Log in with social media
+```
+
+---
+
+## Step 22
+
+You will now be logged in as **Administrator**.
+
+---
+
+## Step 23
+
+Open the **Admin Panel**.
+
+---
+
+## Step 24
+
+Delete the user:
+
+```
+carlos
+```
+
+---
+
+## Step 25
+
+The lab is solved. ✅
+
+
+
+Take reference from this video:
+
+https://www.youtube.com/watch?v=77LpEJ3RCgM
+

