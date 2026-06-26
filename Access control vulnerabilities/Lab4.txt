@@ -43,7 +43,7 @@ This approach is insecure because a user can modify the value and access functio
 3. Intercept the request while entering login credentials in Burp Suite and send it to the Repeater tab. Now close the intercept and in repeater send the request. You will see the roleid is 1 in the request.
 
 
-4. Now go to the change-email /account/change-email and intercept the request. Send it to the repeater, close the intercept and Now got to the repeater to change the roleid from 1 to 2 in the request and send it. you will see the role is changed to 2 in the response.
+4. Now go to the change-email /account/change-email and intercept the request. Send it to the repeater, close the intercept and Now go to the repeater to change the roleid from 1 to 2 in the request and send it. you will see the role is changed to 2 in the response.
 
 
 5. Now refresh the page and you will see the admin panel is accessible. Now go to the admin panel and delete the user carlos to solve the lab.
